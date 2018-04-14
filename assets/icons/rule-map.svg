@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-471 258 23 23">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #fff;
+      }
+    </style>
+  </defs>
+  <path id="ic_device_hub_24px" class="cls-1" d="M20.889,19.611,15.778,14.5V10.437a3.833,3.833,0,1,0-2.556,0V14.5L8.111,19.611H3V26H9.389V22.1L14.5,16.736,19.611,22.1V26H26V19.611Z" transform="translate(-474 255)"/>
+</svg>
