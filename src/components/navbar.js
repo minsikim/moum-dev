@@ -1,11 +1,14 @@
 import React from 'react';
 
-export default class Navbar extends React.Component{
-    render(){
-        return 
-        <div>
-            <object data="your.svg" type="image/svg+xml"></object>
-        </div>
+const navbar = (props) => {
+    const style= {
+
     }
+    return (
+        <div style={style} onClick={props.click} className='navbar' id={props.id}>
+            <p>{props.char}</p>
+        </div>
+    );
 }
 
+export default navbar;
