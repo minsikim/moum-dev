@@ -1,4 +1,8 @@
 import React from 'react';
+import LogBar from './log-bar'
+import NavBar from './nav-bar'
+import NavMenu from './nav-menu'
+import TabWrapper from './tab-wrapper'
 
 const __LEFT_NAV_BAR_MENU__ = {
   default: [
@@ -15,14 +19,28 @@ const __LEFT_NAV_BAR_MENU__ = {
 
 
 export default class App extends React.Component {
+
   render() {
     const style = {
-      color: 'white'
+      root: {
+        display: 'grid',
+        gridTemplateRows: 'auto',
+        resize: 'both'
+      },
+      main: {
+        display: 'flex',
+        height: (window.innerHeight-20)+'px'
+      }
     }
 
     return (
-    <div style={style}>
-      <h2>Welcome to React!</h2>
+    <div style={style.root}>
+      <div style={style.main}>
+        <NavBar />
+        <NavMenu />
+        <TabWrapper />
+      </div>
+      <LogBar />
     </div>);
   }
 }

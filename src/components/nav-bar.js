@@ -2,11 +2,12 @@ import React from 'react';
 
 const navbar = (props) => {
     const style= {
-
+        width: '60px',
+        backgroundColor: '#333',
+        height: '100%'
     }
     return (
-        <div style={style} onClick={props.click} className='navbar' id={props.id}>
-            <p>{props.char}</p>
+        <div style={style}>
         </div>
     );
 }
