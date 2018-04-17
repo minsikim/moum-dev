@@ -4,11 +4,25 @@ import TabGroup from 'electron-tabs';
 
 let tabGroup  = new TabGroup();
 console.log(tabGroup)
-// let tab = tabGroup.addTab({
-//     title: "Electron",
-//     src: "http://electron.atom.io",
-//     visible: true
-// });
+let tab = tabGroup.addTab({  
+    title: 'Home',
+    src: './app.html',
+    webviewAttributes: {
+        'nodeintegration': true
+    },
+    icon: 'fa fa-home',
+    visible: true,
+    closable: false,
+    active: true,
+    ready: tab => {
+        // Open dev tools for webview
+        let webview = tab.webview;
+        if (!!webview) {
+            webview.addEventListener('dom-ready', () => {
+                webview.openDevTools();
+            })
+        }
+    }});
 
 const tabWrapper = (props) => {
     const style= {
