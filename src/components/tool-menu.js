@@ -1,6 +1,6 @@
 import React from 'react';
 
-const navMenu = (props) => {
+const toolMenu = (props) => {
     const style= {
         width: '250px',
         backgroundColor: '#292929',
@@ -8,9 +8,9 @@ const navMenu = (props) => {
     }
     return (
         <div style={style}>
-
+            
         </div>
     );
 }
 
-export default navMenu;
+export default toolMenu;

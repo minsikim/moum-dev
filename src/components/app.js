@@ -1,46 +1,71 @@
 import React from 'react';
-import LogBar from './log-bar'
-import NavBar from './nav-bar'
-import NavMenu from './nav-menu'
-import TabWrapper from './tab-wrapper'
+import Radium from 'radium'
+import LogBar from './log-bar';
+import NavBar from './nav-bar';
+import NavMenu from './nav-menu';
+import ToolMenu from './tool-menu'
+import TabWrapper from './tab-wrapper';
 
-const __LEFT_NAV_BAR_MENU__ = {
-  default: [
-    {name:'glyph-navigator', svg_file: '', index: 0},
-    {name:'particle-manager', svg_file: '', index: 1},
-    {name:'kerning', svg_file: '', index: 2},
-    {name:'font-family', svg_file: '', index: 2},
-    {name:'rule-map', svg_file: '', index: 3},
-    {name:'font-info', svg_file: '', index: 4}
-  ],
-  iconSourceDirectory: '../assets/icons/',
-  history: []
+//Settings for initial program execution
+const SETTINGS = {
+  startPage: true,
+  
 }
 
-
-export default class App extends React.Component {
+class App extends React.Component {
+  constructor(props){
+    super(props);
+    
+    this.state = {
+      navBar: true,
+      navMenu: true,
+      toolMenu: true,
+    }
+  }
+  
+  
 
   render() {
     const style = {
       root: {
         display: 'grid',
-        gridTemplateRows: 'auto',
-        resize: 'both'
+        gridTemplateRows: 'auto 20px',
+        resize: 'both',
+        width: '100vw',
+        height: '100vh'
       },
       main: {
         display: 'flex',
-        height: (window.innerHeight-20)+'px'
+        height: 'calc(100% - 20px)'
+      },
+      tabWrapper: {
+        height: '100%',
+        flexGrow: '1'
       }
     }
+    
+    const navBar = (this.state.navBar) ? <NavBar/> : null;
+    const navMenu = (this.state.navMenu) ? <NavMenu/> : null;
+    const toolMenu = (this.state.toolMenu) ? <ToolMenu/> : null;
 
     return (
     <div style={style.root}>
       <div style={style.main}>
-        <NavBar />
-        <NavMenu />
-        <TabWrapper />
+        {navBar}
+        {navMenu}
+        <div style={style.tabWrapper}>
+          <div className="etabs-tabgroup">
+              <div className="etabs-tabs"></div>
+              <div className="etabs-buttons"></div>
+          </div>
+          <div className="etabs-views"></div>
+        </div>
+        {toolMenu}
       </div>
       <LogBar />
     </div>);
   }
 }
+
+
+export default App;

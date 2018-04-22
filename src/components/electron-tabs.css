@@ -1,7 +1,7 @@
 .etabs-tabgroup {
     width: 100%;
     height: 32px;
-    background-color: #ccc;
+    background-color: #252525;
     cursor: default;
     font: caption;
     font-size: 14px;
@@ -16,16 +16,17 @@
 .etabs-tab {
     display: none;
     position: relative;
-    color: #333;
+    color: lightgray;
     height: 22px;
     padding: 6px 8px 4px;
-    border: 1px solid #aaa;
+    border: 1px solid #171717;
     border-bottom: none;
     border-left: none;
-    background: linear-gradient(to bottom, rgba(234,234,234,1) 0%,rgba(204,204,204,1) 100%);
+    /* background: linear-gradient(to bottom, rgba(234,234,234,1) 0%,rgba(204,204,204,1) 100%); */
     font: caption;
-    font-size: 14px;
-    background-color: #ccc;
+    font-size: 12px;
+    font-weight: 500;
+    background-color: #252525;
     cursor: default;
 }
 
@@ -40,14 +41,15 @@
 
 .etabs-tab.visible {
     display: inline-block;
+    background-color: #252525
 }
 
 .etabs-tab.active {
-    background: #fff;
+    background: #171717;
 }
 
 .etabs-tab.flash {
-    background: linear-gradient(to bottom, rgba(255,243,170,1) 0%,rgba(255,227,37,1) 100%);
+    /* background: linear-gradient(to bottom, rgba(255,243,170,1) 0%,rgba(255,227,37,1) 100%); */
 }
 
 .etabs-buttons {
@@ -56,7 +58,7 @@
 
 .etabs-buttons button {
     float: left;
-    color: #333;
+    color: lightgray;
     background: none;
     border: none;
     font-size: 12px;
@@ -68,10 +70,10 @@
     padding: 4px 0;
 }
 
-.etabs-buttons button:hover {
+/* .etabs-buttons button:hover {
     color: #eee;
     background-color: #aaa;
-}
+} */
 
 .etabs-tab-badge {
     position: absolute;
@@ -110,7 +112,7 @@
 
 .etabs-tab-buttons button {
     display: inline-block;
-    color: #333;
+    color: lightgray;
     background: none;
     border: none;
     width: 20px;
@@ -118,13 +120,17 @@
     border-radius: 2px;
 }
 
+.etabs-tab-button-close{
+    font-size: small;
+}
+
 .etabs-tab-buttons button:hover {
     color: #eee;
-    background-color: #aaa;
+    background-color: #444;
 }
 
 .etabs-views {
-    border-top: 1px solid #aaa;
+    border-top: 1px solid #171717;
     height: calc(100vh - 33px);
 }
 
