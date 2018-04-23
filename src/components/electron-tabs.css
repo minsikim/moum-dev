@@ -11,6 +11,7 @@
 
 .etabs-tabs {
     float: left;
+    font-family: 'Lato';
 }
 
 .etabs-tab {
@@ -28,6 +29,9 @@
     font-weight: 500;
     background-color: #252525;
     cursor: default;
+    font-family: "Lato";
+    font-weight: 700;
+    font-size: 13px;
 }
 
 /* Dragula */

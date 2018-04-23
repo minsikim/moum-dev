@@ -1,7 +1,5 @@
 import React from 'react';
 
-
-
 const tabWrapper = (props) => {
     const style= {
         width: 'auto',

@@ -20,6 +20,7 @@ class App extends React.Component {
       navBar: true,
       navMenu: true,
       toolMenu: true,
+      navMenu: 'glyph-navigator'
     }
   }
   
