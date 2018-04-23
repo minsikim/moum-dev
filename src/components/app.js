@@ -24,7 +24,9 @@ class App extends React.Component {
     }
   }
   
-  
+  toggleNavMenu(newMenu){
+    this.setState({navMenu: newMenu})
+  }
 
   render() {
     const style = {
@@ -45,9 +47,19 @@ class App extends React.Component {
       }
     }
     
-    const navBar = (this.state.navBar) ? <NavBar/> : null;
-    const navMenu = (this.state.navMenu) ? <NavMenu/> : null;
-    const toolMenu = (this.state.toolMenu) ? <ToolMenu/> : null;
+    const navBarProps = {
+      
+    }
+    const navMenuProps = {
+      
+    }
+    const toolMenuProps = {
+      
+    }
+
+    const navBar = (this.state.navBar) ? <NavBar {...navBarProps}/> : null;
+    const navMenu = (this.state.navMenu) ? <NavMenu {...navMenuProps}/> : null;
+    const toolMenu = (this.state.toolMenu) ? <ToolMenu {...toolMenuProps}/> : null;
 
     return (
     <div style={style.root}>

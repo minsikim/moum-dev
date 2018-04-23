@@ -97,7 +97,8 @@ class navMenu extends React.Component {
         return (
             <div style={style.main}>
                 <div style={style.title}>{this.state.currentMenu.toUpperCase()}</div>
-                <MenuTab name={'default'}/>
+                <MenuTab name={'selection'}/>
+                <MenuTab name={'deformation'}/>
             </div>
         );
     }
