@@ -1,0 +1,40 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        body{
+            margin: 0px;
+            background-color: #252525;
+            color: white;
+            padding: 10px;
+            font-family: 'Lato';
+            display: flex;
+            flex-direction: column;
+            /* -ms-flex-align: start; */
+        }
+        body *{
+            margin: 10px;
+        }
+        @import "@getable/lato";
+    </style>
+</head>
+<body>
+    <div>Font Name</div>
+    <input id="filename" type="text" autofocus placeholder="Insert font name...">
+    <button id="button" >Generate</button>
+</body>
+<script>
+    import {ipcRenderer, remote} from 'electron';
+
+    document.getElementById('button').addEventListener('click', ()=>{
+        console.log('sending new-font via ipc')
+        let fontName = document.getElementById('filename').value;
+        ipcRenderer.send('new-font', fontName);
+        var window = remote.getCurrentWindow();
+        window.close();
+    })
+</script>
+</html>
