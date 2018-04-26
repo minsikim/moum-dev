@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <link rel="stylesheet" type="text/css" href="./components/electron-tabs.css"/>
+  <link rel="stylesheet" type="text/css" href="./tabs/electron-tabs.css"/>
   <style>
     @import "@getable/lato";
     body{font-family: 'Lato'}
@@ -17,7 +17,7 @@
   import {AppContainer} from 'react-hot-loader';
 
   const render = () => {
-    const App = require('./components/app.js').default;
+    const App = require('./containers/app.js').default;
     ReactDOM.render(<AppContainer><App /></AppContainer>, document.getElementById('App'));
   }
 
@@ -26,5 +26,5 @@
     module.hot.accept(render);
 }
 </script>
-<script src='./components/tabs.js'></script>
+<script src='./tabs/tabs.js'></script>
 </html>

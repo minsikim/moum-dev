@@ -1,10 +1,10 @@
 import React from 'react';
 import Radium from 'radium'
-import LogBar from './log-bar';
-import NavBar from './nav-bar';
-import NavMenu from './nav-menu';
-import ToolMenu from './tool-menu'
-import TabWrapper from './tab-wrapper';
+import LogBar from '../components/log-bar';
+import NavBar from '../components/nav-bar';
+import NavMenu from '../components/nav-menu';
+import ToolMenu from '../components/tool-menu'
+import TabWrapper from '../components/tab-wrapper';
 
 //Settings for initial program execution
 const SETTINGS = {
