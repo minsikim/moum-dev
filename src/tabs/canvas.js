@@ -1,11 +1,19 @@
 // This file is required by the index.html file and will
 // be executed in the renderer process for that window.
 // All of the Node.js APIs are available in this process.
+const opentype = require('opentype.js')
+
 'use strict';
 
 console.log('renderer.js init');
 const p = require('paper');
 console.log(p);
+let FONT = null;
+// let FONT = null;
+setTimeout(()=>{
+    FONT = opentype.loadSync(document.body.id);
+},10000)
+
 
 const canvas = document.createElement('canvas');
 canvas.resize = 'true';

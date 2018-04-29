@@ -9,5 +9,8 @@ let myFont = null;
 
 ipcRenderer.on('load-on-canvas', (event, props)=>{
     console.log('receiving load-on-canvas in canvas.js'+Date.now())
-    myFont = opentype.loadSync(props[0]);
+    console.log(props[1])
+    setTimeout(()=>{
+        document.body.id = props[1];
+    },3000);
 })

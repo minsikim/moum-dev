@@ -107,7 +107,7 @@ ipcRenderer.on('open-font', (event, filename)=>{
                         console.log(event.channel);
                         console.log(`got load-on-canvas via tabs.js and eventListener in webview (id:{webview.id}) `+webview.id);
                     })
-                    webview.send('load-on-canvas', [tempFileName, filename])
+                    webview.send('load-on-canvas', [tempFileName, ...filename])
                 }
             }
         },1000)
