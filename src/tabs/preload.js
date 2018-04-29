@@ -12,5 +12,5 @@ ipcRenderer.on('load-on-canvas', (event, props)=>{
     console.log(props[1])
     setTimeout(()=>{
         document.body.id = props[1];
-    },3000);
+    },1000);
 })

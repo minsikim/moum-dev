@@ -11,8 +11,9 @@ console.log(p);
 let FONT = null;
 // let FONT = null;
 setTimeout(()=>{
+    console.log('loading FONT')
     FONT = opentype.loadSync(document.body.id);
-},10000)
+},2000)
 
 
 const canvas = document.createElement('canvas');
