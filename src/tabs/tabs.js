@@ -8,7 +8,8 @@ const welcomeTabOptions = {
     title: 'Welcome',
     src: './tabs/welcome.html',
     webviewAttributes: {
-        'nodeintegration': true
+        'nodeintegration': true,
+        'preload': './tabs/preload.js'
     },
     icon: 'fa',
     iconURL: path.join(__dirname,'../assets/icons/arrow_drop.svg'),
@@ -40,7 +41,7 @@ const defaultTabOptions = {
         let webview = tab.webview;
         if (!!webview) {
             webview.addEventListener('dom-ready', () => {
-                // webview.openDevTools();
+                webview.openDevTools();
             })
         }
     }
@@ -79,10 +80,23 @@ ipcRenderer.on('addTab', (event, fontName)=>{
     options.title = fontName+'.ttf'
     tabGroup.addTab(options);
 })
-
+let newTab = null;
+let tempFileName = null;
+let tempTabId = null;
 ipcRenderer.on('open-font', (event, filename)=>{
-    console.log('open-font activated in tabs.js')
+    console.log('open-font activated in tabs.js'+Date.now())
     var options = defaultTabOptions;
-    options.title = path.basename(filename);
-    tabGroup.addTab(options);
+    // options.
+    tempFileName = path.basename(filename[0]);
+    options.title = tempFileName;
+    newTab = tabGroup.addTab(options)
+    setTimeout(()=>{
+        tempTabId = newTab.id;
+        console.log('sending load-font-on-canvas...'+Date.now())
+        ipcRenderer.send('load-font-on-canvas', [tempFileName, tempTabId])
+    },10000)
 })
+// newTab.on("webview-ready", (tab) => {
+//     console.log('sending load-font-on-canvas...')
+//     ipcRenderer.send('load-font-on-canvas', [tempFileName, newTabId])
+// });

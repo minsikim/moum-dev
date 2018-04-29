@@ -79,12 +79,15 @@ function newFontWindow(){
   newFontOptionsWindow.loadURL(`file://${__dirname}/windows/newFontOptionsWindow.html`);
   newFontOptionsWindow.once('ready-to-show', ()=>{ newFontOptionsWindow.show(); })
 }
+
+
 ipcMain.on('new-font', (event, fontName)=>{
   // console.log('new-font activated in index.js')
   // console.log(event.sender);
   mainWindow.webContents.send('addTab', fontName)
 })
 const newFontTab = (filename)=>{
+  console.log('sending open-font event, '+filename);
   mainWindow.webContents.send('open-font', filename)
 }
 function openFont(){
@@ -102,9 +105,13 @@ function openFont(){
     ],
   },newFontTab
 )}
-// mainWindow.webContents.on('new-font', (event, fontName)=>{
-//   ipcMain.send('new-font', fontName);
-// })
+
+ipcMain.on('load-font-on-canvas', (event, props)=>{
+  console.log('receiving load-font-on-canvas in index.js'+Date.now())
+  console.log(props)
+  console.log('sending load-on-canvas from index.js'+Date.now())
+  mainWindow.webContents.send('load-on-canvas', props)
+})
 
 //Menu template
 const menuTemplate = [
