@@ -51,7 +51,6 @@
     "electron-compile": "^6.4.2",
     "electron-devtools-installer": "^2.2.3",
     "electron-squirrel-startup": "^1.0.0",
-    "electron-tabs": "^0.9.1",
     "opentype.js": "^0.6.9",
     "paper": "^0.11.5",
     "react": "^15.6.2",

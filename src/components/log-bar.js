@@ -4,8 +4,8 @@ const logbar = (props) => {
     const style= {
         height: '20px',
         backgroundColor: '#FBE58E',
-        position: 'relative',
-        bottom: '20px'
+        // position: 'relative',
+        // bottom: '20px'
     }
     return (
         <div style={style}>

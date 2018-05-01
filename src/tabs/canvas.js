@@ -5,27 +5,16 @@ const opentype = require('opentype.js')
 
 'use strict';
 
-console.log('renderer.js init');
-const p = require('paper');
-console.log(p);
-let FONT = null;
-// let FONT = null;
-setTimeout(()=>{
-    console.log('loading FONT')
-    FONT = opentype.loadSync(document.body.id);
-},2000)
-
-
-const canvas = document.createElement('canvas');
-canvas.resize = 'true';
-canvas.id = 'myCanvas';
-document.body.appendChild(canvas);
+const currentCanvas = document.createElement('canvas');
+currentCanvas.resize = 'true';
+currentCanvas.id = 'myCanvas';
+document.body.appendChild(currentCanvas);
 
 //initial setup
 (function (){
     stylize();
     resizeCanvas();
-    p.setup(canvas);
+    p.setup(currentCanvas);
     initLayers();
 })();
 
@@ -34,7 +23,7 @@ function stylize(){
     document.body.style.overflow = 'hidden';
     document.body.style.margin = '0px';
     //canvas(#myCanvas)
-    canvas.style.backgroundColor = 'white';
+    currentCanvas.style.backgroundColor = 'white';
 }
 
 function resizeCanvas (){
@@ -43,10 +32,10 @@ function resizeCanvas (){
     document.body.style.width = window.innerWidth+'px';
     document.body.style.height = window.innerHeight+'px';
     //always
-    canvas.style.width = canvas.parentElement.offsetWidth+'px';
-    canvas.style.height = canvas.parentElement.offsetHeight+'px';
-    canvas.width = canvas.parentElement.offsetWidth;
-    canvas.height = canvas.parentElement.offsetHeight;
+    currentCanvas.style.width = currentCanvas.parentElement.offsetWidth+'px';
+    currentCanvas.style.height = currentCanvas.parentElement.offsetHeight+'px';
+    currentCanvas.width = currentCanvas.parentElement.offsetWidth;
+    currentCanvas.height = currentCanvas.parentElement.offsetHeight;
     //set p.view.viewSize
 };
 
@@ -96,7 +85,7 @@ const draw = {
         var textsize = 8; /* fontsize for pointtext shift */
         //draw a vertical line
         var temp1 = new p.Point(x*dist, 0-extension);
-        var temp2 = new p.Point(x*dist, canvas.height+extension);
+        var temp2 = new p.Point(x*dist, currentCanvas.height+extension);
         var path = new p.Path.Line(temp1, temp2);
         path.strokeColor = 'black';
         path.strokeWidth = 0.3;
@@ -120,7 +109,7 @@ const draw = {
         var textsize = 8; /* fontsize for pointtext shift */
         //draw a vertical line
         var temp1 = new p.Point(-extension, y*dist);
-        var temp2 = new p.Point(canvas.width+extension, y*dist);
+        var temp2 = new p.Point(currentCanvas.width+extension, y*dist);
         var path = new p.Path.Line(temp1, temp2);
         path.strokeColor = 'black';
         path.strokeWidth = 0.3;
@@ -140,10 +129,10 @@ const draw = {
         // p.project.layers
         manage.activateLayerById('grid')
         var extension = 1000;
-        for(var i = 0, i = Math.round(i-extension/d); i < (canvas.width+extension)/d; i++){
+        for(var i = 0, i = Math.round(i-extension/d); i < (currentCanvas.width+extension)/d; i++){
             this.vLine(i, d)
         }
-        for(var i = 0, i = Math.round(i-extension/d); i < (canvas.height+extension)/d; i++){
+        for(var i = 0, i = Math.round(i-extension/d); i < (currentCanvas.height+extension)/d; i++){
             this.hLine(i, d)
         }
     },
@@ -175,7 +164,7 @@ const zoom = {
 const events = (function (){
     window.onresize = function(e){
         resizeCanvas();
-        p.view.setViewSize(canvas.width, canvas.height);
+        p.view.setViewSize(currentCanvas.width, currentCanvas.height);
         for(var i in p.project.layers){
             var tempLayer = p.project.layers[i]
             if(tempLayer.getVisible() == true){
@@ -208,14 +197,14 @@ canvasTool.onKeyDown = function (event) {
     switch(event.key){
         case 'space':{
             KEY_SPACE = true;
-            canvas.style.cursor = 'move';
+            currentCanvas.style.cursor = 'move';
             return;
         } case 'v':{
             KEY_V = true;
             return;
         } case 'control':{
             KEY_CONTROL = true;
-            canvas.style.cursor = 'zoom-in';
+            currentCanvas.style.cursor = 'zoom-in';
         } default : {
             console.log(event)
         }
@@ -225,11 +214,11 @@ canvasTool.onKeyUp = function (event) {
     switch(event.key){
         case 'space':{
             KEY_SPACE = false;
-            canvas.style.cursor = 'default';
+            currentCanvas.style.cursor = 'default';
             return;
         } case 'control':{
             KEY_CONTROL = false;
-            canvas.style.cursor = 'default';
+            currentCanvas.style.cursor = 'default';
         }
     }
 }
@@ -259,7 +248,7 @@ canvasTool.onMouseUp = function (event) {
     }
 }
 
-canvas.addEventListener('mousewheel', function(event){
+currentCanvas.addEventListener('mousewheel', function(event){
     var tempPoint = new p.Point(event.x, event.y);
     if(KEY_CONTROL == false) return;
     if(0 < event.wheelDeltaY){

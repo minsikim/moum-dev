@@ -5,6 +5,7 @@ import NavBar from '../components/nav-bar';
 import NavMenu from '../components/nav-menu';
 import ToolMenu from '../components/tool-menu'
 import TabWrapper from '../components/tab-wrapper';
+import Tabs from '../tabs/tabs'
 
 //Settings for initial program execution
 const SETTINGS = {
@@ -20,7 +21,7 @@ class App extends React.Component {
       navBar: true,
       navMenu: true,
       toolMenu: true,
-      navMenu: 'glyph-navigator'
+      tabs: true
     }
   }
   
@@ -39,7 +40,7 @@ class App extends React.Component {
       },
       main: {
         display: 'flex',
-        height: 'calc(100% - 20px)'
+        height: '100%'
       },
       tabWrapper: {
         height: '100%',
@@ -56,23 +57,21 @@ class App extends React.Component {
     const toolMenuProps = {
       
     }
+    const tabsProps = {
+      
+    }
 
     const navBar = (this.state.navBar) ? <NavBar {...navBarProps}/> : null;
     const navMenu = (this.state.navMenu) ? <NavMenu {...navMenuProps}/> : null;
     const toolMenu = (this.state.toolMenu) ? <ToolMenu {...toolMenuProps}/> : null;
+    const tabs = (this.state.tabs) ? <Tabs style={style.tabWrapper} {...tabsProps}/> : null;
 
     return (
     <div style={style.root}>
       <div style={style.main}>
         {navBar}
         {navMenu}
-        <div style={style.tabWrapper}>
-          <div className="etabs-tabgroup">
-              <div className="etabs-tabs"></div>
-              <div className="etabs-buttons"></div>
-          </div>
-          <div className="etabs-views"></div>
-        </div>
+        {tabs}
         {toolMenu}
       </div>
       <LogBar />
