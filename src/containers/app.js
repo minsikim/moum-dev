@@ -23,6 +23,11 @@ class App extends React.Component {
       tabs: {
         default: ['welcome'],
         tabs: [
+          {
+            type: 'welcome',
+            title: 'Welcome',
+            id: ''
+          }
           //type: for icon
           //title: for text and id
           //id: title_type_index
@@ -35,6 +40,20 @@ class App extends React.Component {
   
   toggleNavMenu(newMenu){
     this.setState({navMenu: newMenu})
+  }
+
+  addTab(type){
+    switch (type){
+      case 'welcome':
+        
+        break;
+      case 'fonts':
+        break;
+      case 'moum':
+        break;
+      default:
+        break;
+    }
   }
 
   render() {
@@ -50,7 +69,7 @@ class App extends React.Component {
         display: 'flex',
         height: '100%'
       },
-      tabWrapper: {
+      tabs: {
         height: '100%',
         flexGrow: '1'
       }
@@ -70,9 +89,15 @@ class App extends React.Component {
     }
 
     const navBar = (this.state.navBar) ? <NavBar {...navBarProps}/> : null;
+
     const navMenu = (this.state.navMenu) ? <NavMenu {...navMenuProps}/> : null;
+
     const toolMenu = (this.state.toolMenu) ? <ToolMenu {...toolMenuProps}/> : null;
-    const tabs = (this.state.tabs) ? <Tabs style={style.tabWrapper} {...tabsProps}/> : null;
+
+    const tabs = (
+      <Tabs style={style.tabs}
+      {...tabsProps}/>
+    )
 
     return (
     <div style={style.root}>

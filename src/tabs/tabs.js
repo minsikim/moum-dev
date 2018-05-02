@@ -50,7 +50,7 @@ const TabView = (props) => {
     )
 }
 
-const tabWrapper = (props) => {
+const Tabs = (props) => {
     const style= {
         // '@import': "@getable/lato",
         // fontFamily: 'Lato'
@@ -61,12 +61,12 @@ const tabWrapper = (props) => {
         // h1{font-weight: 400;}
     }
     return (
-        <div style={props.style}>
+        <div style={this.style}>
             <TabBar props={props.tabs}
             click={props.click}/>
-            <TabView />
+            <TabView props={props.tabs}/>
         </div>
     );
 }
 
-export default Radium(tabWrapper);
+export default Radium(Tabs);
