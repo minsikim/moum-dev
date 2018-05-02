@@ -3,6 +3,9 @@ import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-insta
 import { enableLiveReload } from 'electron-compile';
 import path from 'path';
 import fs from 'fs';
+import MenuFunction from './controllers/menu-functions';
+
+let mfunc = null;
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -29,8 +32,12 @@ const createWindow = async () => {
     await installExtension(REACT_DEVELOPER_TOOLS);
     mainWindow.webContents.openDevTools();
   }
+
+  //setting menu from template
   const mainMenu = Menu.buildFromTemplate(menuTemplate);
   Menu.setApplicationMenu(mainMenu);
+  mfunc = new MenuFunction(mainWindow);
+
   // Emitted when the window is closed.
   mainWindow.on('closed', () => {
     // Dereference the window object, usually you would store windows
@@ -66,52 +73,6 @@ app.on('activate', () => {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
 
-//ipcMain on functions
-let newFontOptionsWindow = null;
-
-function newFontWindow(){
-  newFontOptionsWindow = new BrowserWindow({
-    width: 400,
-    height: 250,
-    menu: null,
-    
-  });
-  newFontOptionsWindow.loadURL(`file://${__dirname}/windows/newFontOptionsWindow.html`);
-  newFontOptionsWindow.once('ready-to-show', ()=>{ newFontOptionsWindow.show(); })
-}
-
-
-ipcMain.on('new-font', (event, fontName)=>{
-  // console.log('new-font activated in index.js')
-  // console.log(event.sender);
-  mainWindow.webContents.send('addTab', fontName)
-})
-const newFontTab = (filename)=>{
-  console.log('sending open-font event, '+filename);
-  mainWindow.webContents.send('open-font', filename)
-}
-function openFont(){
-  dialog.showOpenDialog({
-    title: 'Open Font',
-    defaultPath: path.join(require("os").homedir(),'/Documents'),
-    properties: [
-      'showHiddenFiles', 
-    ],
-    filters: [
-      { name: 'All Fonts', extensions: ['woff', 'ttf', 'otf']},
-      { name: 'Web Fonts', extensions: ['woff'] },
-      { name: 'True Type Fonts', extensions: ['ttf'] },
-      { name: 'Open Type Fonts', extensions: ['otf'] }
-    ],
-  },newFontTab
-)}
-
-ipcMain.on('load-font-on-canvas', (event, props)=>{
-  console.log('receiving load-font-on-canvas in index.js'+Date.now())
-  console.log(props)
-  console.log('sending load-on-canvas from index.js'+Date.now())
-  mainWindow.webContents.send('load-on-canvas', props)
-})
 
 //Menu template
 const menuTemplate = [
@@ -123,7 +84,7 @@ const menuTemplate = [
         accelerator: process.platform === 'darwin' ? 'Command+N' : 'Ctrl+N',
         click(){
           console.log('New Font Menu clicked');
-          newFontWindow();
+          mfunc.newFontWindow();
         },
         id: '_newFont'
       },
@@ -132,7 +93,7 @@ const menuTemplate = [
         accelerator: process.platform === 'darwin' ? 'Command+O' : 'Ctrl+O',
         click(){
           console.log('Open Project Menu clicked')
-          openFont();
+          mfunc.openFont();
         },
         id: '_openProject'
       },

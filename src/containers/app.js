@@ -4,7 +4,6 @@ import LogBar from '../components/log-bar';
 import NavBar from '../components/nav-bar';
 import NavMenu from '../components/nav-menu';
 import ToolMenu from '../components/tool-menu'
-import TabWrapper from '../components/tab-wrapper';
 import Tabs from '../tabs/tabs'
 
 //Settings for initial program execution
@@ -21,7 +20,16 @@ class App extends React.Component {
       navBar: true,
       navMenu: true,
       toolMenu: true,
-      tabs: true
+      tabs: {
+        default: ['welcome'],
+        tabs: [
+          //type: for icon
+          //title: for text and id
+          //id: title_type_index
+        ],
+        nextIndex: 1
+      }
+
     }
   }
   

@@ -1,10 +1,51 @@
 import React from 'react';
 import Radium from 'radium';
+import path from 'path';
 
-const Hello = (props) => {
+const TabBar = (props) => {
+    const style = {
+        base: {
+            
+        },
+        tabBar: {
+            display: 'flex',
+            height: '20px',
+            overflow: 'hidden'
+        },
+        tab: {
+            fontSize: '12px',
+            fontWeight: '500'
+        },
+        icon: {
+            maxWidth: '10px',
+        },
+    }
+
+    let tabs = null;
+    tabs = (
+        <div style={[style.base, style.tabBar]}>
+            {props.tabs.map((obj)=>{
+                return(
+                    <div
+                    style={[style.base, style.tab]}
+                    onClick={props.click}>
+                        <img
+                        src={path.join(__dirname, '../../assets/icons/', obj.type+'.svg')}
+                        style={style.icon}/>
+                    </div>
+                )
+            })}
+        </div>
+    )
+    return (
+        {tabs}
+    )
+}
+
+const TabView = (props) => {
     return (
         <div>
-            Hello
+            tabs
         </div>
     )
 }
@@ -21,12 +62,9 @@ const tabWrapper = (props) => {
     }
     return (
         <div style={props.style}>
-            <Hello/>
-            <div className="tabgroup">
-                <div className="tabs"></div>
-                <div className="buttons"></div>
-            </div>
-            <div className="views" id="canvas-div"></div>
+            <TabBar props={props.tabs}
+            click={props.click}/>
+            <TabView />
         </div>
     );
 }
