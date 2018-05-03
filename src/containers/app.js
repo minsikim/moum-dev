@@ -96,7 +96,8 @@ class App extends React.Component {
 
     const tabs = (
       <Tabs style={style.tabs}
-      {...tabsProps}/>
+      {...tabsProps}
+      {...this.state.tabs}/>
     )
 
     return (

@@ -1,70 +1,85 @@
 import React from 'react';
 import Radium from 'radium';
 import path from 'path';
+import Welcome from './welcome';
 
 const TabBar = (props) => {
     const style = {
         base: {
-            
+            color: 'white'
         },
         tabBar: {
             display: 'flex',
-            height: '20px',
-            overflow: 'hidden'
+            height: '33px',
+            overflow: 'hidden',
+            backgroundColor: '#252525'
         },
         tab: {
-            fontSize: '12px',
-            fontWeight: '500'
+            fontSize: '13px',
+            fontWeight: '500',
+            alignItems: 'center',
         },
         icon: {
-            maxWidth: '10px',
+            maxWidth: '20px',
+            margin: '5px'
         },
+        close: {
+            margin: '5px',
+            padding: '6px',
+            fontSize: '15px'
+        }
     }
-
-    let tabs = null;
-    tabs = (
-        <div style={[style.base, style.tabBar]}>
-            {props.tabs.map((obj)=>{
-                return(
-                    <div
-                    style={[style.base, style.tab]}
-                    onClick={props.click}>
-                        <img
-                        src={path.join(__dirname, '../../assets/icons/', obj.type+'.svg')}
-                        style={style.icon}/>
-                    </div>
-                )
-            })}
-        </div>
-    )
+    console.log(props.tabs)
+    // for(key in props.tabs){
+    //     console.log(key)
+    //     // console.log(props.tabs[key].type)
+    // }
     return (
-        {tabs}
+        <div style={Object.assign(style.base,style.tabBar)}>
+            <div style={Object.assign(style.base,style.tab)}>
+                <img src={path.join(__dirname, '../../assets/icons/',props.tabs[0].type)+'.svg'}
+                style={style.icon}/>{props.tabs[0].title}
+                <div>×</div>
+            </div>
+        </div>
     )
 }
 
 const TabView = (props) => {
-    return (
-        <div>
-            tabs
-        </div>
-    )
+    const style = {
+        base:{
+            position: 'absolute'
+        },
+        active:{
+            zIndex: '1'
+        },
+        inactive:{
+            zIndex: '0'
+        }
+    }
+    let tabView = [];
+    for(var i = 0; i < props.tabs.length; i++){
+        if(props.tabs[i].type == 'welcome'){
+            tabView.push(<Welcome id={'welcome_'+i} style={[style.base, style.inactive]}/>)
+        } else {
+            tabView.push(<canvas id={'canvas_'+i} style={[style.base, style.inactive]}/>)
+        }
+        
+    }
+    // tabView[tabView.length-1].style = [style.base, style.active];
+    // console.log(props)
+    return <div>{tabView}</div>
 }
 
 const Tabs = (props) => {
     const style= {
-        // '@import': "@getable/lato",
-        // fontFamily: 'Lato'
-        // p: {
-        //         fontWeight: '100'
-        //     }
-        // .yellow{color: #FBE58E; font-weight: 900}
-        // h1{font-weight: 400;}
+        flexGrow: '1'
     }
+    console.log(props)
     return (
-        <div style={this.style}>
-            <TabBar props={props.tabs}
-            click={props.click}/>
-            <TabView props={props.tabs}/>
+        <div style={style}>
+            <TabBar {...props}/>
+            <TabView {...props}/>
         </div>
     );
 }
