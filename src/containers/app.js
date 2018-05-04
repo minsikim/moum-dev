@@ -27,6 +27,11 @@ class App extends React.Component {
             type: 'welcome',
             title: 'Welcome',
             id: ''
+          },
+          {
+            type: 'fonts',
+            title: 'Welcome',
+            id: ''
           }
           //type: for icon
           //title: for text and id
@@ -54,6 +59,10 @@ class App extends React.Component {
       default:
         break;
     }
+  }
+
+  componentDidMount(){
+    console.log(document.querySelectorAll('canvas'))
   }
 
   render() {
