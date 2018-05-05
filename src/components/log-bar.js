@@ -27,11 +27,13 @@ class Logbar extends Component {
                 backgroundColor: '#FBE58E',
                 position: 'relative',
                 bottom: '20px',
-                alignItems: 'center'
+                alignItems: 'center',
+                display: 'flex'
             },
             text:{
                 fontSize: 12,
-                color: 'red'
+                color: 'green',
+                margin: '0px 0px 0px 10px'
             }
         }
 

@@ -10,8 +10,7 @@ const welcomeTabOptions = {
     webviewAttributes: {
         'nodeintegration': true,
     },
-    icon: 'fa',
-    iconURL: path.join(__dirname,'../assets/icons/arrow_drop.svg'),
+    iconURL: path.join(__dirname,'../assets/icons/moum.svg'),
     visible: true,
     closable: true,
     active: true,
@@ -32,7 +31,7 @@ const defaultTabOptions = {
         'nodeintegration': true,
         'preload': './tabs/preload.js'
     },
-    iconURL: '../assets/icons/arrow_drop.svg',
+    iconURL: path.join(__dirname,'../assets/icons/fonts.svg'),
     visible: true,
     closable: true,
     active: true,
