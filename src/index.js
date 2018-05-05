@@ -20,7 +20,8 @@ const createWindow = async () => {
   mainWindow = new BrowserWindow({
     width: 1600,
     height: 900,
-    title: 'Moum v0.1.0'
+    title: 'Moum v0.1.0',
+    icon: path.join(__dirname, '../assets/icons/moum.png')
   });
 
   // and load the index.html of the app.
