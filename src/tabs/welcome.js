@@ -12,7 +12,7 @@ const welcomePage = (props) => {
         height: '100%'
     }
     return (
-        <div style={Object.assign({},props.style, style)}>
+        <div style={Object.assign({},props.style, style)} id={props.id}>
             <div style={{padding: 40}}>
                 <h1>Welcome to <span className='yellow'>MOUM</span></h1>
                 <p>This is a Designer's Application for Font Design<br/>Specifically matching the needs of CJKV.</p>

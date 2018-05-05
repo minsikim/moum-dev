@@ -30,7 +30,7 @@ class App extends React.Component {
           },
           {
             type: 'fonts',
-            title: 'Welcome',
+            title: 'myFont.ttf',
             id: ''
           }
           //type: for icon
