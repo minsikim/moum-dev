@@ -1,9 +1,7 @@
 // This file is required by the index.html file and will
 // be executed in the renderer process for that window.
 // All of the Node.js APIs are available in this process.
-const opentype = require('opentype.js')
-
-'use strict';
+console.log(document.parentElement)
 
 const currentCanvas = document.createElement('canvas');
 currentCanvas.resize = 'true';
@@ -14,7 +12,7 @@ document.body.appendChild(currentCanvas);
 (function (){
     stylize();
     resizeCanvas();
-    p.setup(currentCanvas);
+    paper.setup(currentCanvas);
     initLayers();
 })();
 
@@ -28,7 +26,7 @@ function stylize(){
 
 function resizeCanvas (){
     //if canvas is set in the body
-    // p.setup(canvas);
+    // paper.setup(canvas);
     document.body.style.width = window.innerWidth+'px';
     document.body.style.height = window.innerHeight+'px';
     //always
@@ -36,34 +34,34 @@ function resizeCanvas (){
     currentCanvas.style.height = currentCanvas.parentElement.offsetHeight+'px';
     currentCanvas.width = currentCanvas.parentElement.offsetWidth;
     currentCanvas.height = currentCanvas.parentElement.offsetHeight;
-    //set p.view.viewSize
+    //set paper.view.viewSize
 };
 
 function initLayers(){
     //remove All Layers
-    if(p.project.layers.length != 0){
-        for(var i = 0; 0 < p.project.layers.length; i++){
-            p.project.layers[0].remove()
+    if(paper.project.layers.length != 0){
+        for(var i = 0; 0 < paper.project.layers.length; i++){
+            paper.project.layers[0].remove()
         }
     }
 
     //add gridLayer
-    p.project.addLayer(new p.Layer({
+    paper.project.addLayer(new paper.Layer({
         children:[],
         name: "grid"
     }))
     //add baseline Layer
-    p.project.addLayer(new p.Layer({
+    paper.project.addLayer(new paper.Layer({
         children:[],
         name: "baseline"
     }))
     //add Glyph Layer
-    p.project.addLayer(new p.Layer({
+    paper.project.addLayer(new paper.Layer({
         children:[],
         name: "glyph"
     }))
     //add smart Glyph Layer
-    p.project.addLayer(new p.Layer({
+    paper.project.addLayer(new paper.Layer({
         children:[],
         name: "smartGlyph"
     }))
@@ -71,7 +69,7 @@ function initLayers(){
 
 const manage = {
     activateLayerById: function(name){
-        p.project.layers[name].activate();
+        paper.project.layers[name].activate();
     }
 }
 
@@ -84,13 +82,13 @@ const draw = {
         var extension = 1000; /* extended line for window pan/zoom/resize */
         var textsize = 8; /* fontsize for pointtext shift */
         //draw a vertical line
-        var temp1 = new p.Point(x*dist, 0-extension);
-        var temp2 = new p.Point(x*dist, currentCanvas.height+extension);
-        var path = new p.Path.Line(temp1, temp2);
+        var temp1 = new paper.Point(x*dist, 0-extension);
+        var temp2 = new paper.Point(x*dist, currentCanvas.height+extension);
+        var path = new paper.Path.Line(temp1, temp2);
         path.strokeColor = 'black';
         path.strokeWidth = 0.3;
         //draw text alinged with vertical line
-        var text = new p.PointText({
+        var text = new paper.PointText({
             point: [x*dist+margin, margin+textsize],
             content: x*dist,
             fillColor: 'darkgrey',
@@ -99,7 +97,7 @@ const draw = {
             fontSize: textsize
         })
         //group line and text
-        new p.Group([path, text])
+        new paper.Group([path, text])
     },
     hLine: function(y, d){
         //change if needed
@@ -108,13 +106,13 @@ const draw = {
         var extension = 1000; /* extended line for window pan/zoom/resize */
         var textsize = 8; /* fontsize for pointtext shift */
         //draw a vertical line
-        var temp1 = new p.Point(-extension, y*dist);
-        var temp2 = new p.Point(currentCanvas.width+extension, y*dist);
-        var path = new p.Path.Line(temp1, temp2);
+        var temp1 = new paper.Point(-extension, y*dist);
+        var temp2 = new paper.Point(currentCanvas.width+extension, y*dist);
+        var path = new paper.Path.Line(temp1, temp2);
         path.strokeColor = 'black';
         path.strokeWidth = 0.3;
         //draw text alinged with vertical line
-        var text = new p.PointText({
+        var text = new paper.PointText({
             point: [margin, y*dist-margin],
             content: y*dist,
             fillColor: 'darkgrey',
@@ -123,10 +121,10 @@ const draw = {
             fontSize: textsize
         })
         //group line and text
-        new p.Group([path, text])
+        new paper.Group([path, text])
     },
     grid: function(d){
-        // p.project.layers
+        // paper.project.layers
         manage.activateLayerById('grid')
         var extension = 1000;
         for(var i = 0, i = Math.round(i-extension/d); i < (currentCanvas.width+extension)/d; i++){
@@ -137,7 +135,7 @@ const draw = {
         }
     },
     point: function(){
-        // p.project.layers
+        // paper.project.layers
         if(arguments.length === 0){
 
         }
@@ -148,15 +146,15 @@ const DEFAULT_SCALING = 1
 
 const zoom = {
     in: function(point){
-        if(point==undefined) point = p.view.center;
-        p.view.scale(5/4, point)
+        if(point==undefined) point = paper.view.center;
+        paper.view.scale(5/4, point)
     },
     out: function(point){
-        if(point==undefined) point = p.view.center;
-        p.view.scale(4/5, point)
+        if(point==undefined) point = paper.view.center;
+        paper.view.scale(4/5, point)
     },
     extent: function(){
-        p.view.scaling = DEFAULT_SCALING;
+        paper.view.scaling = DEFAULT_SCALING;
     }
 }
 
@@ -164,9 +162,9 @@ const zoom = {
 const events = (function (){
     window.onresize = function(e){
         resizeCanvas();
-        p.view.setViewSize(currentCanvas.width, currentCanvas.height);
-        for(var i in p.project.layers){
-            var tempLayer = p.project.layers[i]
+        paper.view.setViewSize(currentCanvas.width, currentCanvas.height);
+        for(var i in paper.project.layers){
+            var tempLayer = paper.project.layers[i]
             if(tempLayer.getVisible() == true){
                 tempLayer.setVisible(false);
                 tempLayer.setVisible(true);
@@ -183,11 +181,11 @@ var isMouseDown = false;
 var offsetPoint;
 var downPoint;
 
-var canvasTool = new p.Tool();
+var canvasTool = new paper.Tool();
 canvasTool.onMouseDrag = function (event) {
     if(KEY_SPACE){
         offsetPoint = event.downPoint.subtract(event.point);
-        p.view.setCenter(p.view.center.add(offsetPoint));
+        paper.view.setCenter(paper.view.center.add(offsetPoint));
     }
 };
 let KEY_SPACE = false;
@@ -249,7 +247,7 @@ canvasTool.onMouseUp = function (event) {
 }
 
 currentCanvas.addEventListener('mousewheel', function(event){
-    var tempPoint = new p.Point(event.x, event.y);
+    var tempPoint = new paper.Point(event.x, event.y);
     if(KEY_CONTROL == false) return;
     if(0 < event.wheelDeltaY){
         zoom.in(tempPoint);
@@ -261,16 +259,16 @@ currentCanvas.addEventListener('mousewheel', function(event){
 /* 
     canvas.onmousedown = function(event) {
         isMouseDown = true
-        downPoint = new p.Point(event.clientX, event.clientY)
+        downPoint = new paper.Point(event.clientX, event.clientY)
     };
     canvas.onmouseup   = function() { isMouseDown = false };
     canvas.onmousemove = function(event) {
         if(isMouseDown) {
-        var currentPoint = new p.Point(event.clientX, event.clientY)
+        var currentPoint = new paper.Point(event.clientX, event.clientY)
         console.log(event)
         console.log(downPoint);
         offsetPoint = downPoint.subtract(currentPoint);
-        p.view.setCenter(p.view.center.add(offsetPoint));
+        paper.view.setCenter(paper.view.center.add(offsetPoint));
         }
     };
 */
@@ -279,5 +277,5 @@ currentCanvas.addEventListener('mousewheel', function(event){
 //     this = Object.assign({
 
 
-//     }, p.Path)
+//     }, paper.Path)
 // }

@@ -119,19 +119,20 @@ const TabView = (props) => {
             style={(i == props.tabs.length-1) ? Object.assign({}, style.view, style.active):Object.assign({}, style.view, style.inactive)}
             onClick={(e)=>{console.log(e.target.id)}}/>)
         } else {
-            tabView.push(<canvas id={thisType+'_'+i}
-            className='web-view'
-            key={i}
-            style={(i == props.tabs.length-1) ? Object.assign({}, style.view, style.active, {background: 'white'}):Object.assign({}, style.view, style.inactive)}
-            onLoad={(e)=>{
-                console.log('onLoad')
-                // console.log('setting paper on canvas '+e.target.id);
-                // document.p = p;
-                // p.setup(document.querySelector('canvas#'+e.target.id));
-            }}
-            onClick={(e)=>{
-                console.log(e.target.id)
-            }}/>)
+            tabView.push(
+                <iframe
+                id={thisType+'_'+i}
+                key={i}
+                style={(i == props.tabs.length-1) ? Object.assign({}, style.view, style.active, {background: 'white'}):Object.assign({}, style.view, style.inactive)}
+                src={path.join(__dirname, '../canvas/canvas.html')}></iframe>
+            // <canvas id={thisType+'_'+i}
+            // className='web-view'
+            // key={i}
+            // style={(i == props.tabs.length-1) ? Object.assign({}, style.view, style.active, {background: 'white'}):Object.assign({}, style.view, style.inactive)}
+            // onClick={(e)=>{
+            //     console.log(e.target.id)
+            // }}/>
+            )
         }
     }
     return <div style={style.base}>{tabView}</div>
