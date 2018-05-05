@@ -110,7 +110,8 @@ class App extends React.Component {
     )
 
     return (
-    <div style={style.root}>
+    <div style={style.root}
+    onClick={(e)=>{console.log(e)}}>
       <div style={style.main}>
         {navBar}
         {navMenu}

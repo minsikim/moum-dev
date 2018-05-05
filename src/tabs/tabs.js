@@ -120,18 +120,18 @@ const TabView = (props) => {
             onClick={(e)=>{console.log(e.target.id)}}/>)
         } else {
             tabView.push(
-                <iframe
-                id={thisType+'_'+i}
-                key={i}
-                style={(i == props.tabs.length-1) ? Object.assign({}, style.view, style.active, {background: 'white'}):Object.assign({}, style.view, style.inactive)}
-                src={path.join(__dirname, '../canvas/canvas.html')}></iframe>
-            // <canvas id={thisType+'_'+i}
-            // className='web-view'
-            // key={i}
-            // style={(i == props.tabs.length-1) ? Object.assign({}, style.view, style.active, {background: 'white'}):Object.assign({}, style.view, style.inactive)}
-            // onClick={(e)=>{
-            //     console.log(e.target.id)
-            // }}/>
+                // <iframe
+                // id={thisType+'_'+i}
+                // key={i}
+                // style={(i == props.tabs.length-1) ? Object.assign({}, style.view, style.active, {background: 'white'}):Object.assign({}, style.view, style.inactive)}
+                // src={path.join(__dirname, '../canvas/canvas.html')}></iframe>
+            <canvas id={thisType+'_'+i}
+            className='web-view'
+            key={i}
+            style={(i == props.tabs.length-1) ? Object.assign({}, style.view, style.active, {background: 'white'}):Object.assign({}, style.view, style.inactive)}
+            onClick={(e)=>{
+                console.log(e.target.id)
+            }}/>
             )
         }
     }
