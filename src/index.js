@@ -4,6 +4,8 @@ import { enableLiveReload } from 'electron-compile';
 import path from 'path';
 import fs from 'fs';
 
+import { TEST_FONT, FONT_INFO } from './constants/event-names';
+
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
@@ -80,6 +82,15 @@ function newFontWindow(){
   newFontOptionsWindow.once('ready-to-show', ()=>{ newFontOptionsWindow.show(); })
 }
 
+ipcMain.on(TEST_FONT, (event, arg)=>{
+  console.log('recieved from index.js : test-button');
+  console.log('sent test-button from index.js')
+})
+
+ipcMain.on(FONT_INFO, (event, arg)=>{
+  console.log(event);
+  console.log(arg)
+})
 
 ipcMain.on('new-font', (event, fontName)=>{
   // console.log('new-font activated in index.js')

@@ -9,6 +9,7 @@ console.log('renderer.js init');
 const p = require('paper');
 console.log(p);
 let FONT = null;
+global.FONT = FONT;
 // let FONT = null;
 setTimeout(()=>{
     console.log('loading FONT')
@@ -100,6 +101,7 @@ const draw = {
         var path = new p.Path.Line(temp1, temp2);
         path.strokeColor = 'black';
         path.strokeWidth = 0.3;
+        path.strokeScaling = false;
         //draw text alinged with vertical line
         var text = new p.PointText({
             point: [x*dist+margin, margin+textsize],
@@ -124,6 +126,7 @@ const draw = {
         var path = new p.Path.Line(temp1, temp2);
         path.strokeColor = 'black';
         path.strokeWidth = 0.3;
+        path.strokeScaling = false;
         //draw text alinged with vertical line
         var text = new p.PointText({
             point: [margin, y*dist-margin],

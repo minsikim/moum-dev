@@ -1,5 +1,8 @@
 import React from 'react';
 import path from 'path';
+import { ipcRenderer } from 'electron';
+
+import { TEST_FONT } from '../constants/event-names';
 
 class MenuTab extends React.Component{
     constructor(props){
@@ -74,7 +77,26 @@ class navMenu extends React.Component {
         this.state = {
             currentMenu: 'default'
         }
+        this.clickHandler = this.clickHandler.bind(this)
+
     }
+
+    clickHandler(){
+        // ipcRenderer.send(TEST_FONT, 'something');
+        // console.log('sent to ipcMain : test-button')
+        webviews = document.querySelectorAll('webview')
+        for(var i = 0; i< webviews.length; i++){
+            webview = webviews[i]
+            if(webview != null){
+                console.log(webview)
+                webview.addEventListener('ipc-message', (event)=>{
+                    console.log(event.channel);
+                })
+                webview.send(TEST_FONT, 'something')
+            }
+        }
+    }
+
     render(){
         const style= {
             main: {
@@ -99,6 +121,8 @@ class navMenu extends React.Component {
                 <div style={style.title}>{this.state.currentMenu.toUpperCase()}</div>
                 <MenuTab name={'selection'}/>
                 <MenuTab name={'deformation'}/>
+                <button
+                onClick={this.clickHandler}>EVENT</button>
             </div>
         );
     }
