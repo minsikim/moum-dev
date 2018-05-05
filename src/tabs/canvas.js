@@ -8,12 +8,11 @@ const opentype = require('opentype.js')
 console.log('renderer.js init');
 const p = require('paper');
 console.log(p);
-let FONT = null;
-global.FONT = FONT;
+global.FONT = null;
 // let FONT = null;
 setTimeout(()=>{
     console.log('loading FONT')
-    FONT = opentype.loadSync(document.body.id);
+    global.FONT = opentype.loadSync(document.body.id);
 },2000)
 
 

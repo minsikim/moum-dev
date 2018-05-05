@@ -2,7 +2,7 @@ const electron = require('electron');
 const paper = require('paper');
 const opentype = require('opentype.js');
 const {ipcRenderer} = electron;
-const { TEST_FONT, FONT_INFO } = require('../constants/event-names')
+const { TEST_FONT, FONT_INFO, FONT_TO_LOG_BAR } = require('../constants/event-names')
 
 console.log('preload.js activated')
 
@@ -18,6 +18,6 @@ ipcRenderer.on('load-on-canvas', (event, props)=>{
 })
 
 ipcRenderer.on(TEST_FONT, (event, props)=>{
-    console.log('test button init');
-    ipcRenderer.send(FONT_INFO, global.FONT);
+    console.log('test button init: sending arg: ', global.FONT);
+    ipcRenderer.send(FONT_INFO, FONT);
 })
