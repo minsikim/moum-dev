@@ -3,8 +3,54 @@
   <head>
     <meta charset="UTF-8">
     <title>Hello World!</title>
+    <style>
+      #tools{
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        height: 30px;
+        display: flex;
+      }
+      .tool-button{
+        background-color: white;
+        height: 100%;
+        width: 30px;
+      }
+      .tool-button img{
+        max-width: 18px;
+      }
+      .ruler{
+        background-color: #171717;
+      }
+      #ruler-horizontal{
+        height: 15px;
+      }
+      #ruler-vertical{
+        width: 15px; 
+      }
+    </style>
   </head>
-  <body style='margin:0px;'>
+  <body style='margin:0px; height:100%; width:100%; display: flex; flex-direction: column'>
+    <div id="ruler-horizontal" class="ruler"></div>
+    <div style='display: flex'>
+      <div id="ruler-vertical" class="ruler"></div>
+      <div id="myCanvasDiv" style="flex-grow: 1; position: relative">
+        <div id="tools">
+            <div class="tool-button">
+              <img src="../assets/button/select-mode.svg">
+            </div>
+            <div class="tool-button">
+              <img src="../assets/button/select-mode.svg">
+            </div>
+            <div class="tool-button">
+              <img src="../assets/button/select-mode.svg">
+            </div>
+            <div class="tool-button">
+              <img src="../assets/button/select-mode.svg">
+            </div>
+          </div>
+      </div>
+    </div>
     <script src="canvas.js"></script>
   </body>
 </html>

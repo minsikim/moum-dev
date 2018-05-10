@@ -2,24 +2,25 @@
 // be executed in the renderer process for that window.
 // All of the Node.js APIs are available in this process.
 const opentype = require('opentype.js')
+const p = require('paper');
 
 'use strict';
 
 console.log('renderer.js init');
-const p = require('paper');
 console.log(p);
 global.FONT = null;
 // let FONT = null;
 setTimeout(()=>{
     console.log('loading FONT')
     global.FONT = opentype.loadSync(document.body.id);
-},2000)
+},1000)
 
 
 const canvas = document.createElement('canvas');
 canvas.resize = 'true';
 canvas.id = 'myCanvas';
-document.body.appendChild(canvas);
+const myCanvasDiv = document.getElementById('myCanvasDiv')
+myCanvasDiv.appendChild(canvas);
 
 //initial setup
 (function (){
@@ -39,14 +40,14 @@ function stylize(){
 
 function resizeCanvas (){
     //if canvas is set in the body
-    // p.setup(canvas);
-    document.body.style.width = window.innerWidth+'px';
-    document.body.style.height = window.innerHeight+'px';
-    //always
-    canvas.style.width = canvas.parentElement.offsetWidth+'px';
-    canvas.style.height = canvas.parentElement.offsetHeight+'px';
-    canvas.width = canvas.parentElement.offsetWidth;
-    canvas.height = canvas.parentElement.offsetHeight;
+    // // p.setup(canvas);
+    // document.body.style.width = window.innerWidth+'px';
+    // document.body.style.height = window.innerHeight+'px';
+    // //always
+    // canvas.style.width = canvas.parentElement.offsetWidth+'px';
+    // canvas.style.height = canvas.parentElement.offsetHeight+'px';
+    // canvas.width = canvas.parentElement.offsetWidth;
+    // canvas.height = canvas.parentElement.offsetHeight;
     //set p.view.viewSize
 };
 
@@ -201,6 +202,8 @@ canvasTool.onMouseDrag = function (event) {
     if(KEY_SPACE){
         offsetPoint = event.downPoint.subtract(event.point);
         p.view.setCenter(p.view.center.add(offsetPoint));
+    }else{
+        
     }
 };
 let KEY_SPACE = false;
