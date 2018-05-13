@@ -97,6 +97,7 @@ function initLayers(){
 const manage = {
     activateLayerByName: function(name){
         p.project.layers[name].activate();
+        return p.project.layers[name];
     },
     getLayerByName: function(name){
         for(var i = 0; i < p.project.layers.length; i++){
@@ -118,7 +119,7 @@ const draw = {
         //change if needed
         var dist = (d == undefined) ? 100 : d; /* distance between line */
         var margin = 5; /* margin between line and text */
-        var extension = 1000; /* extended line for window pan/zoom/resize */
+        var extension = 2000; /* extended line for window pan/zoom/resize */
         var textsize = 8; /* fontsize for pointtext shift */
         //draw a vertical line
         var temp1 = new p.Point(x*dist, 0-extension);
@@ -143,7 +144,7 @@ const draw = {
         //change if needed
         var dist = (d == undefined) ? 100 : d; /* distance between line */
         var margin = 5; /* margin between line and text */
-        var extension = 1000; /* extended line for window pan/zoom/resize */
+        var extension = 2000; /* extended line for window pan/zoom/resize */
         var textsize = 8; /* fontsize for pointtext shift */
         //draw a vertical line
         var temp1 = new p.Point(-extension, y*dist);
@@ -175,18 +176,24 @@ const draw = {
             this.hLine(i, d)
         }
     },
-    point: function(){
+    point: function(x,y){
         // p.project.layers
-        if(arguments.length === 0){
-
-        }
+        manage.activateLayerByName('glyph');
+        var point = new Point(x,y);
+        point.strokeColor = '#30c2ff';
     },
     selectionBox: function(x1,y1,x2,y2){
+        manage.clearLayer('editMode')
+        manage.activateLayerByName('editMode');
         var p1 = new p.Point(x1,y1);
         var p2 = new p.Point(x2,y2);
-        var box = new p.Rectangle(p1,p2);
-        box.
+        var box = new p.Path.Rectangle(p1,p2);
+        box.strokeColor = '#0098FF';
+        box.strokeScaling = false;
+        box.fillColor = '#0098FF';
+        box.fillColor.alpha = 0.1;
     }
+    
 }
 
 const DEFAULT_SCALING = 1
@@ -229,14 +236,6 @@ var offsetPoint;
 var downPoint;
 
 var canvasTool = new p.Tool();
-canvasTool.onMouseDrag = function (event) {
-    if(KEY_SPACE){
-        offsetPoint = event.downPoint.subtract(event.point);
-        p.view.setCenter(p.view.center.add(offsetPoint));
-    }else{
-        
-    }
-};
 
 const EDIT_MODE = {
     CURRENT: 'SELECTION_MODE_V',
@@ -392,19 +391,25 @@ canvasTool.onMouseDown = function (event) {
         }
     }
 }
+
 canvasTool.onMouseUp = function (event) {
     var currentMode = getEditMode();
     switch(currentMode){
         case 'SELECTION_MODE_A':{
+            manage.clearLayer('editMode');
             break;
         }
         case 'PATH_MODE_P':{
+            if(event.downPoint.x === event.point.x && event.downPoint.y === event.point.y){
+                draw.point(event.point.x, event.point.y);
+            }
             break;
         }
         case 'CUT_MODE_C':{
             break;
         }
         case 'SELECTION_MODE_V':{
+            manage.clearLayer('editMode');
             break;
         }
         case 'PAN_MODE_SPACE':{
@@ -420,6 +425,11 @@ canvasTool.onMouseDrag = function (event) {
     var currentMode = getEditMode();
     switch(currentMode){
         case 'SELECTION_MODE_A':{
+            var startX = event.downPoint.x;
+            var startY = event.downPoint.y;
+            var endX = event.point.x;
+            var endY = event.point.y;
+            draw.selectionBox(startX,startY,endX,endY);
             break;
         }
         case 'PATH_MODE_P':{
@@ -429,13 +439,11 @@ canvasTool.onMouseDrag = function (event) {
             break;
         }
         case 'SELECTION_MODE_V':{
-            manage.activateLayerByName('editMode');
             var startX = event.downPoint.x;
             var startY = event.downPoint.y;
             var endX = event.point.x;
             var endY = event.point.y;
-            
-            console.log(event)
+            draw.selectionBox(startX,startY,endX,endY);
             break;
         }
         case 'PAN_MODE_SPACE':{
@@ -459,26 +467,15 @@ canvas.addEventListener('mousewheel', function(event){
     }
 }, false)
 
-/* 
-    canvas.onmousedown = function(event) {
-        isMouseDown = true
-        downPoint = new p.Point(event.clientX, event.clientY)
-    };
-    canvas.onmouseup   = function() { isMouseDown = false };
-    canvas.onmousemove = function(event) {
-        if(isMouseDown) {
-        var currentPoint = new p.Point(event.clientX, event.clientY)
-        console.log(event)
-        console.log(downPoint);
-        offsetPoint = downPoint.subtract(currentPoint);
-        p.view.setCenter(p.view.center.add(offsetPoint));
-        }
-    };
-*/
-
-// const mPath = {
-//     this = Object.assign({
-
-
-//     }, p.Path)
-// }
+class Point extends p.Path.Circle {
+    constructor(x, y){
+        super(new p.Point(x+5,y), 5);
+        this.fillColor = 'white';
+    }
+    pointActivate(){
+        this.strokeColor = '#30c2ff';
+    }
+    deactivate(){
+        this.strokeColor = 'grey';
+    }
+}
