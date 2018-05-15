@@ -12,12 +12,12 @@ ipcRenderer.on('load-on-canvas', (event, props)=>{
     console.log('receiving load-on-canvas in canvas.js'+Date.now())
     console.log(props[1])
     setTimeout(()=>{
-        document.body.id = props[1];
         document.props = props;
+        global.FONT = opentype.loadSync(document.props[1]);
     },1000);
 })
 
-ipcRenderer.on(TEST_FONT, (event, props)=>{
-    console.log('test button init: sending arg: ', global.FONT);
-    ipcRenderer.send(FONT_INFO, FONT);
-})
+// ipcRenderer.on(TEST_FONT, (event, props)=>{
+//     console.log('test button init: sending arg: ', global.FONT);
+//     ipcRenderer.send(FONT_INFO, FONT);
+// })

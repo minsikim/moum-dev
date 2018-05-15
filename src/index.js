@@ -4,7 +4,12 @@ import { enableLiveReload } from 'electron-compile';
 import path from 'path';
 import fs from 'fs';
 
-import { TEST_FONT, FONT_INFO, FONT_TO_LOG_BAR } from './constants/event-names';
+import {
+  TEST_FONT,
+  FONT_INFO,
+  FONT_TO_LOG_BAR,
+  TO_LOG_BAR,
+  LOGGER } from './constants/event-names';
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -89,13 +94,16 @@ ipcMain.on(TEST_FONT, (event, arg)=>{
 })
 
 ipcMain.on(FONT_INFO, (event, arg)=>{
-  console.log('recieved TEST_FONT from webview');
+  console.log('recieved FONT_INFO from webview');
   mainWindow.send(FONT_TO_LOG_BAR, arg);
 })
 
+ipcMain.on(TO_LOG_BAR, (event, arg)=>{
+  console.log('recieved TO_LOG_BAR from webview');
+  mainWindow.send(LOGGER, arg);
+})
+
 ipcMain.on('new-font', (event, fontName)=>{
-  // console.log('new-font activated in index.js')
-  // console.log(event.sender);
   mainWindow.webContents.send('addTab', fontName)
 })
 const newFontTab = (filename)=>{

@@ -4,18 +4,26 @@
 const opentype = require('opentype.js')
 const p = require('paper');
 const path = require('path');
+const {ipcRenderer} = require('electron');
+const { TEST_FONT, FONT_INFO, FONT_TO_LOG_BAR, TO_LOG_BAR } = require('../constants/event-names')
+const autoBind = require('auto-bind');
 
 'use strict';
 
-console.log('renderer.js init');
-console.log(p);
 global.FONT = null;
-// let FONT = null;
 setTimeout(()=>{
-    console.log('loading FONT')
-    global.FONT = opentype.loadSync(document.body.id);
-},1000)
+    console.log('test button init: sending arg: ', global.FONT);
+    ipcRenderer.send(FONT_INFO, FONT);
+},1500)
 
+function log(args){
+    var message = '';
+    for(var i = 0; i < arguments.length; i++){
+        message += arguments[i]
+        if(i !== arguments.length-1 || arguments.length !==1) message += ', '
+    }
+    ipcRenderer.send(TO_LOG_BAR, message);
+}
 
 const canvas = document.createElement('canvas');
 canvas.resize = 'true';
@@ -72,7 +80,7 @@ function initLayers(){
     }))
     //add Glyph Layer
     p.project.addLayer(new p.Layer({
-        children:[],
+        children:[new p.Group({name: 'currentPath'})],
         name: "glyph"
     }))
     //add smart Glyph Layer
@@ -109,6 +117,9 @@ const manage = {
     clearLayer: function(name){
         var layer = this.getLayerByName(name);
         layer.removeChildren();
+    },
+    getCurrentPath: function(){
+        return manage.getLayerByName('glyph').getFirstChild()
     }
 
 }
@@ -178,9 +189,15 @@ const draw = {
     },
     point: function(x,y){
         // p.project.layers
+        x = Math.round(x);
+        y = Math.round(y);
         manage.activateLayerByName('glyph');
         var point = new Point(x,y);
-        point.strokeColor = '#30c2ff';
+        point.pointActivate();
+        var index = manage.getCurrentPath().children.length!==0 ? manage.getCurrentPath().children.length-1 : null;
+        if(index != null) manage.getCurrentPath().children[index].pointDeactivate();
+        manage.getCurrentPath().addChild(point)
+        log('New Point: '+x+', '+y)
     },
     selectionBox: function(x1,y1,x2,y2){
         manage.clearLayer('editMode')
@@ -192,6 +209,26 @@ const draw = {
         box.strokeScaling = false;
         box.fillColor = '#0098FF';
         box.fillColor.alpha = 0.1;
+    },
+    glyph: function(char, point){
+        mange.activateLayerByName('glyph')
+    },
+    glyphEscape: function(){
+        manage.activateLayerByName('glyph')
+        manage.getCurrentPath().getLastChild().pointDeactivate();
+        manage.getLayerByName('glyph').addChild(new p.Group({children: manage.getCurrentPath().children}))
+        manage.getCurrentPath().removeChildren();
+    },
+    glyphEscapeAll: function(){
+            manage.activateLayerByName('glyph')
+            manage.getLayerByName('glyph').children.map((obj)=>{obj.children.map((obj)=>{obj.pointDeactivate();})})
+    },
+    calc(point){
+        if(typeof point === 'object'){
+            point.x = -point.x;
+        }else if (typeof point === 'number'){
+            point = -point;
+        }
     }
     
 }
@@ -209,6 +246,7 @@ const zoom = {
     },
     extent: function(){
         p.view.scaling = DEFAULT_SCALING;
+        p.view.center = new p.Point(500,500)
     }
 }
 
@@ -345,12 +383,49 @@ canvasTool.onKeyDown = function (event) {
         } case 'control':{
             setMode('ZOOM_MODE_CTRL')
             break;
+        } case 'escape':{
+            var currentMode = getEditMode();
+            switch(currentMode){
+                case 'SELECTION_MODE_A':{
+                    break;
+                }
+                case 'PATH_MODE_P':{
+                    draw.glyphEscape();
+                    break;
+                }
+                case 'CUT_MODE_C':{
+                    break;
+                }
+                case 'SELECTION_MODE_V':{
+                    break;
+                }
+                case 'PAN_MODE_SPACE':{
+                    break;
+                }
+                case 'ZOOM_MODE_CTRL':{
+                    break;
+                }
+            }
+            draw.glyphEscapeAll();
+            break;
+        } case 'delete':{
+            manage.getLayerByName('glyph').children.map((group)=>{
+                    group.children.map((item)=>{
+                        if(item.select===true) item.remove();
+                        if(group.children.length == 0) group.remove();
+                    })
+                })
+            break;
         } default : {
             console.log(event)
             break;
         }
     }
+    if(EDIT_MODE.LAST == 'PATH_MODE_P'){
+        draw.glyphEscape();
+    }
 }
+
 canvasTool.onKeyUp = function (event) {
     console.log('keyup', event.key);
     switch(event.key){
@@ -467,15 +542,127 @@ canvas.addEventListener('mousewheel', function(event){
     }
 }, false)
 
-class Point extends p.Path.Circle {
+class Point extends p.Group {
     constructor(x, y){
-        super(new p.Point(x+5,y), 5);
-        this.fillColor = 'white';
+        super();
+        this.active = true;
+        this.select = true;
+        this.radius = 4;
+        this.activeStrokeColor = '#91DFFF';
+        this.activeFillColor = 'white';
+        this.deactiveStrokeColor = 'grey';
+        this.deactiveFillColor = 'white';
+        this.selectedFillColor = '#30c2ff'
+        var point = new p.Path.Circle(new p.Point(x+5,y), this.radius);
+        point.fillColor = 'white';
+        var coordinates = new p.Group({
+            children: [
+                new p.Path.Rectangle({
+                    point: [x+15, y-28],
+                    size: [48, 18],
+                    fillColor: '#aaa',
+                    radius: 3
+                }),
+                new p.PointText({
+                    point: [x+20, y-15],
+                    content: x.toString()+', '+y.toString(),
+                    fillColor: 'white',
+                    fontSize: 10
+                })
+            ]
+        })
+        this.addChildren([point, coordinates]);
+        autoBind(this);
+
+        this.onMouseEnter = function(event) {
+            if(!this.active) this.pointActivate()
+        }
+        this.onMouseLeave = function(event) {
+            if(event.target.select == false) this.pointDeactivate();
+        }
+        this.onClick = function(event) {
+            if(event.target.select === false) {
+                this.pointActivate()
+                this.Select();
+            }else if(event.target.select === true) {
+                this.pointDeactivate();
+            }
+        }
+        this.onMouseDrag = function(event) {
+
+        }
     }
     pointActivate(){
-        this.strokeColor = '#30c2ff';
+        this.children[0].strokeColor = '#30c2ff';
+        if(this.children[1].visible == false)this.children[1].visible = true;
+        this.active = true;
     }
-    deactivate(){
-        this.strokeColor = 'grey';
+    pointDeactivate(){
+        this.children[0].strokeColor = 'grey';
+        this.children[1].visible = false;
+        this.active = false;
+        this.Deselect();
+    }
+    Select(){
+        this.children[0].fillColor = '#30c2ff';
+        this.select = true;
+    }
+    Deselect(){
+        this.children[0].fillColor = 'white';
+        this.select = false;
+    }
+}
+
+class Handle extends Point {
+    constructor(x, y){
+        this.active = true;
+        this.select = true;
+        this.radius = 3;
+        this.activeStrokeColor = '#30c2ff';
+        this.activeFillColor = 'white';
+        this.deactiveStrokeColor = 'grey';
+        this.deactiveFillColor = 'white';
+        this.selectedFillColor = '#30c2ff'
+    }
+}
+
+class Path extends p.Group {
+    constructor(point){
+        super();
+        this.active = true;
+        this.select = true;
+
+        if(point) this.addChild(point);
+
+        autoBind(this);
+
+        this.onMouseEnter = function(event) {
+
+        }
+        this.onMouseLeave = function(event) {
+
+        }
+        this.onClick = function(event) {
+
+        }
+        this.onMouseDrag = function(event) {
+
+        }
+    }
+    addPoint(point){
+        
+    }
+    pointActivate(){
+
+    }
+    pointDeactivate(){
+
+        this.Deselect();
+    }
+    Select(){
+
+    }
+    Deselect(){
+
     }
 }

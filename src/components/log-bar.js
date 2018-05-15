@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
-import { FONT_TO_LOG_BAR } from '../constants/event-names';
 import { ipcRenderer } from 'electron';
+import {
+    FONT_TO_LOG_BAR,
+    LOGGER } from '../constants/event-names';
 
 class Logbar extends Component {
     constructor(props){
@@ -12,11 +14,17 @@ class Logbar extends Component {
 
     componentWillUnmount(){
         ipcRenderer.removeListener(FONT_TO_LOG_BAR)
+        ipcRenderer.removeListener(LOGGER)
     }
 
     componentDidMount(){
         ipcRenderer.on(FONT_TO_LOG_BAR, (event, arg)=>{
+            console.log('[log-bar.js] recieved FONT_TO_LOG_BAR from main')
             this.setState({logMessage: arg.names.fontFamily.en+" "+arg.outlinesFormat+" font loaded"})
+        })
+        ipcRenderer.on(LOGGER, (event, arg)=>{
+            console.log('[log-bar.js] recieved LOGGER from main')
+            this.setState({logMessage: arg})
         })
     }
 

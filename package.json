@@ -48,6 +48,7 @@
   },
   "dependencies": {
     "@getable/lato": "^1.0.1",
+    "auto-bind": "^1.2.0",
     "electron-compile": "^6.4.2",
     "electron-devtools-installer": "^2.2.4",
     "electron-squirrel-startup": "^1.0.0",
