@@ -120,8 +120,17 @@ const manage = {
     },
     getCurrentPath: function(){
         return manage.getLayerByName('glyph').getFirstChild()
+    },
+    isSelected: function(){
+        for(var key in this.getLayerByName('glyph').children){
+            for(var key2 in this.getLayerByName('glyph').children[key].children){
+                if(this.getLayerByName('glyph').children[key].children[key2].select===true){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
-
 }
 
 
@@ -406,7 +415,7 @@ canvasTool.onKeyDown = function (event) {
                     break;
                 }
             }
-            draw.glyphEscapeAll();
+            if(manage.isSelected()) draw.glyphEscapeAll();
             break;
         } case 'delete':{
             manage.getLayerByName('glyph').children.map((group)=>{
@@ -616,6 +625,7 @@ class Point extends p.Group {
 
 class Handle extends Point {
     constructor(x, y){
+        super();
         this.className = 'Handle'
         this.active = true;
         this.select = true;
@@ -630,7 +640,9 @@ class Handle extends Point {
 
 
 /*
-    
+    constructor
+        Path(Point)
+        Path(object) object must be 'slice of opentype.js Glyph commands'
 */ 
 class Path extends p.Group {
     constructor(arg){
@@ -656,8 +668,18 @@ class Path extends p.Group {
 
         }
     }
-    addPoint(point){
-        
+    addPoint(point, type){
+        switch(type){
+            case 'm':{
+
+            }case 'm':{
+                
+            }case 'm':{
+                
+            }case 'm':{
+                
+            }
+        }
     }
     pointActivate(){
 
