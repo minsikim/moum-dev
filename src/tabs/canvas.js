@@ -545,6 +545,7 @@ canvas.addEventListener('mousewheel', function(event){
 class Point extends p.Group {
     constructor(x, y){
         super();
+        this.clssName = 'PathPoint'
         this.active = true;
         this.select = true;
         this.radius = 4;
@@ -615,6 +616,7 @@ class Point extends p.Group {
 
 class Handle extends Point {
     constructor(x, y){
+        this.className = 'Handle'
         this.active = true;
         this.select = true;
         this.radius = 3;
@@ -626,13 +628,18 @@ class Handle extends Point {
     }
 }
 
+
+/*
+    
+*/ 
 class Path extends p.Group {
-    constructor(point){
+    constructor(arg){
         super();
+        this.className = 'Path'
         this.active = true;
         this.select = true;
 
-        if(point) this.addChild(point);
+        if(arg) this.addChild(point);
 
         autoBind(this);
 
