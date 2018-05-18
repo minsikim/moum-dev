@@ -125,7 +125,12 @@ const manage = {
     },
     clearLayer: function(name){
         var layer = this.getLayerByName(name);
-        layer.removeChildren();
+        if(name == 'glyph') {
+            layer.removeChildren(1);
+            layer.children[0].removeChildren();
+            
+        }
+        else layer.removeChildren();
     },
     getCurrentPath: function(){
         return manage.getLayerByName('glyph').getFirstChild()
@@ -214,7 +219,7 @@ const draw = {
         var point = new Point(x,y);
         point.pointActivate();
         var index = manage.getCurrentPath().children.length!==0 ? manage.getCurrentPath().children.length-1 : null;
-        if(index != null) manage.getCurrentPath().children[index].pointDeactivate();
+        if(index !== null) {manage.getCurrentPath().children[index].pointDeactivate();}
         manage.getCurrentPath().addChild(point)
         log('New Point: '+x+', '+y)
     },
