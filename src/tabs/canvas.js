@@ -1,3 +1,5 @@
+import { Color } from 'paper';
+
 // This file is required by the index.html file and will
 // be executed in the renderer process for that window.
 // All of the Node.js APIs are available in this process.
@@ -12,6 +14,13 @@ const autoBind = require('auto-bind');
 
 global.FONT = null;
 setTimeout(()=>{
+    if(global.FONT == null) global.FONT = new opentype.Font({
+        familyName: 'myFont',
+        styleName: 'Regular',
+        unitsPerEm : 1000,
+        ascender: 600,
+        descender: -200,
+    });
     console.log('test button init: sending arg: ', global.FONT);
     ipcRenderer.send(FONT_INFO, FONT);
 },1500)
@@ -135,7 +144,7 @@ const manage = {
 
 
 const draw = {
-    basePoint:  (FONT) ? new p.Point(0,FONT.unitsPerEm) : new p.Point(0,0),
+    basePoint:  (FONT) ? new p.Point(0,FONT.unitsPerEm) : new p.Point(0,1000),
     vLine: function(x, d){
         //change if needed
         var dist = (d == undefined) ? 100 : d; /* distance between line */
@@ -221,21 +230,41 @@ const draw = {
         box.fillColor.alpha = 0.1;
     },
     glyph: function(char, point){
-        var basePoint = null;
-        var path = new p.Path({
-            selected: true,
-            strokeColor: 'red',
-            fillColor: 'black',
-        });
-        var glyph = FONT.charToGlyph(char);
         manage.activateLayerByName('glyph');
-        if(point !== undefined){
-            basePoint = point
-        }else{basePoint = draw.basePoint}
         
-        glyph.points.map((obj)=>{
-                path.add(draw.calc(obj.x, obj.y))
+        var basePoint = (point == undefined) ? this.basePoint : point;
+        var glyph = FONT.charToGlyph(char);
+        var pathArr = [];
+        var pathGroup = new p.Group()
+
+        console.log(basePoint)
+
+        var tempLastPoint = 0;
+        for(var i = 0; i < glyph.points.length; i++){
+            if(glyph.points[i].lastPointOfContour == true){
+                pathArr.push(glyph.points.slice(tempLastPoint, i+1));
+                tempLastPoint = i+1;
+            }
+        }
+
+        pathArr.map((pathElement)=>{
+            var path = new p.Path({
+                selected: true,
+                strokeColor: new Color(1,0,0.5,0.7),
+                strokeWidth: 10,
+                // fillColor: 'black',
+                closed: true
+            });
+            pathElement.map((obj)=>{
+                path.add(draw.calc(obj.x, obj.y, basePoint))
+                this.point(draw.calc(obj.x, obj.y, basePoint)[0],draw.calc(obj.x, obj.y, basePoint)[1])
+            })
+            var firstPoint = pathElement[0];
+            path.add(draw.calc(firstPoint.x, firstPoint.y, basePoint))
+            pathGroup.addChild(path);
         })
+        pathGroup.glyph = glyph;
+        return pathGroup;
     },
     glyphEscape: function(){
         manage.activateLayerByName('glyph')
@@ -247,8 +276,8 @@ const draw = {
             manage.activateLayerByName('glyph')
             manage.getLayerByName('glyph').children.map((obj)=>{obj.children.map((obj)=>{obj.pointDeactivate();})})
     },
-    calc(x, y){
-        var basePoint = draw.basePoint;
+    calc(x, y, point){
+        var basePoint = (point == undefined) ? draw.basePoint: point;
         var calcX = basePoint.x + x;
         var calcY = basePoint.y - y;
         var calculatedArr = [calcX, calcY];
@@ -319,7 +348,7 @@ const LAYER_VISIBLE = {
 function setMode(modeName){
     var count = 0;
     if(getEditMode() !== modeName ) EDIT_MODE.LAST = getEditMode();
-    console.log('setMode() => changing', EDIT_MODE.LAST, 'to', modeName)
+    // console.log('setMode() => changing', EDIT_MODE.LAST, 'to', modeName)
     for(var key in EDIT_MODE){
         if(modeName === key){
             EDIT_MODE[key] = true;
@@ -355,32 +384,32 @@ function updateCursor(){
     var currentMode = getEditMode();
     switch(currentMode){
         case 'SELECTION_MODE_A':{
-            console.log('setting mode to SELECTION_MODE_A')
+            // console.log('setting mode to SELECTION_MODE_A')
             setCursorOnCanvas('select_a', 'url');
             break;
         }
         case 'PATH_MODE_P':{
-            console.log('setting mode to PATH_MODE_P')
+            // console.log('setting mode to PATH_MODE_P')
             setCursorOnCanvas('path', 'url');
             break;
         }
         case 'CUT_MODE_C':{
-            console.log('setting mode to CUT_MODE_C')
+            // console.log('setting mode to CUT_MODE_C')
             setCursorOnCanvas('cut', 'url');
             break;
         }
         case 'SELECTION_MODE_V':{
-            console.log('setting mode to SELECTION_MODE_V')
+            // console.log('setting mode to SELECTION_MODE_V')
             setCursorOnCanvas('default');
             break;
         }
         case 'PAN_MODE_SPACE':{
-            console.log('setting mode to PAN_MODE_SPACE')
+            // console.log('setting mode to PAN_MODE_SPACE')
             setCursorOnCanvas('move');
             break;
         }
         case 'ZOOM_MODE_CTRL':{
-            console.log('setting mode to PAN_MODE_SPACE')
+            // console.log('setting mode to PAN_MODE_SPACE')
             setCursorOnCanvas('zoom-in');
             break;
         }
@@ -388,7 +417,7 @@ function updateCursor(){
 }
 
 canvasTool.onKeyDown = function (event) {
-    console.log('keydown', event.key);
+    // console.log('keydown', event.key);
     switch(event.key){
         case 'space':{
             setMode('PAN_MODE_SPACE')
@@ -452,7 +481,7 @@ canvasTool.onKeyDown = function (event) {
 }
 
 canvasTool.onKeyUp = function (event) {
-    console.log('keyup', event.key);
+    // console.log('keyup', event.key);
     switch(event.key){
         case 'space':{
             setMode(EDIT_MODE.LAST);
@@ -707,4 +736,33 @@ class Path extends p.Group {
     Deselect(){
 
     }
+}
+
+
+function info(obj){
+	for(var key in obj){
+		// if(typeof obj[key] == 'object'){
+		// 	console.log(key, info(obj[key]))
+        // }else{
+        // 	console.log(key, obj[key].toString())
+        // }
+        if(obj[key]!==undefined && typeof obj[key]=='object'){
+            var message = key+': ';
+            for(var key2 in obj[key]){
+                message += obj[key][key2]+' ';
+            }
+            console.log(message)
+            if(obj[key].lastPointOfContour == true){
+                console.log('------------------')
+            }
+        }else{
+            console.log(key, obj[key].toString())
+        }
+    }
+}
+
+function infoGlyph(char){
+    var glyph = FONT.charToGlyph(char);
+    var gPoints = glyph.points;
+    info(gPoints);
 }
