@@ -135,6 +135,7 @@ const manage = {
 
 
 const draw = {
+    basePoint:  (FONT) ? new p.Point(0,FONT.unitsPerEm) : new p.Point(0,0),
     vLine: function(x, d){
         //change if needed
         var dist = (d == undefined) ? 100 : d; /* distance between line */
@@ -220,7 +221,21 @@ const draw = {
         box.fillColor.alpha = 0.1;
     },
     glyph: function(char, point){
-        mange.activateLayerByName('glyph')
+        var basePoint = null;
+        var path = new p.Path({
+            selected: true,
+            strokeColor: 'red',
+            fillColor: 'black',
+        });
+        var glyph = FONT.charToGlyph(char);
+        manage.activateLayerByName('glyph');
+        if(point !== undefined){
+            basePoint = point
+        }else{basePoint = draw.basePoint}
+        
+        glyph.points.map((obj)=>{
+                path.add(draw.calc(obj.x, obj.y))
+        })
     },
     glyphEscape: function(){
         manage.activateLayerByName('glyph')
@@ -232,13 +247,14 @@ const draw = {
             manage.activateLayerByName('glyph')
             manage.getLayerByName('glyph').children.map((obj)=>{obj.children.map((obj)=>{obj.pointDeactivate();})})
     },
-    calc(point){
-        if(typeof point === 'object'){
-            point.x = -point.x;
-        }else if (typeof point === 'number'){
-            point = -point;
-        }
-    }
+    calc(x, y){
+        var basePoint = draw.basePoint;
+        var calcX = basePoint.x + x;
+        var calcY = basePoint.y - y;
+        var calculatedArr = [calcX, calcY];
+        return calculatedArr;
+    },
+
     
 }
 
@@ -554,10 +570,12 @@ canvas.addEventListener('mousewheel', function(event){
 class Point extends p.Group {
     constructor(x, y){
         super();
-        this.clssName = 'PathPoint'
+        this._className = 'PathPoint'
         this.active = true;
         this.select = true;
         this.radius = 4;
+        this.x = x;
+        this.y = y;
         this.activeStrokeColor = '#91DFFF';
         this.activeFillColor = 'white';
         this.deactiveStrokeColor = 'grey';
@@ -650,6 +668,7 @@ class Path extends p.Group {
         this.className = 'Path'
         this.active = true;
         this.select = true;
+        this.points = []
 
         if(arg) this.addChild(point);
 
@@ -668,17 +687,11 @@ class Path extends p.Group {
 
         }
     }
-    addPoint(point, type){
-        switch(type){
-            case 'm':{
-
-            }case 'm':{
-                
-            }case 'm':{
-                
-            }case 'm':{
-                
-            }
+    addPoint(point, onCurve){
+        if(onCurve === true){
+            new Point(point)
+        }else{
+            new Point(point)
         }
     }
     pointActivate(){
