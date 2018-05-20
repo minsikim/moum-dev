@@ -240,7 +240,12 @@ const draw = {
         var basePoint = (point == undefined) ? this.basePoint : point;
         var glyph = FONT.charToGlyph(char);
         var pathArr = [];
-        var pathGroup = new p.Group()
+        var pathGroup = new p.CompoundPath({
+            fillColor: 'white',
+            strokeColor: 'black',
+            strokeWidth: 3,
+            strokeScaling: false,
+        })
 
         console.log(basePoint)
 
@@ -254,10 +259,6 @@ const draw = {
 
         pathArr.map((pathElement)=>{
             var path = new p.Path({
-                selected: true,
-                strokeColor: new Color(1,0,0.5,0.7),
-                strokeWidth: 10,
-                // fillColor: 'black',
                 closed: true
             });
             pathElement.map((obj)=>{
@@ -610,23 +611,24 @@ class Point extends p.Group {
         this.radius = 4;
         this.x = x;
         this.y = y;
+        this.point = new p.Point(x, y);
         this.activeStrokeColor = '#91DFFF';
         this.activeFillColor = 'white';
         this.deactiveStrokeColor = 'grey';
         this.deactiveFillColor = 'white';
         this.selectedFillColor = '#30c2ff'
-        var point = new p.Path.Circle(new p.Point(x+5,y), this.radius);
+        var point = new p.Path.Circle(new p.Point(x,y), this.radius);
         point.fillColor = 'white';
         var coordinates = new p.Group({
             children: [
                 new p.Path.Rectangle({
-                    point: [x+15, y-28],
+                    point: [x+10, y-28],
                     size: [48, 18],
                     fillColor: '#aaa',
                     radius: 3
                 }),
                 new p.PointText({
-                    point: [x+20, y-15],
+                    point: [x+15, y-15],
                     content: x.toString()+', '+y.toString(),
                     fillColor: 'white',
                     fontSize: 10
@@ -675,7 +677,7 @@ class Point extends p.Group {
     }
 }
 
-class Handle extends Point {
+class CubicHandle extends Point {
     constructor(x, y){
         super();
         this.className = 'Handle'
@@ -690,19 +692,88 @@ class Handle extends Point {
     }
 }
 
+class QuadricHandle extends Point {
+    constructor(x, y){
+        super();
+        this.className = 'Handle'
+        this.active = true;
+        this.select = true;
+        this.radius = 3;
+        this.activeStrokeColor = '#30c2ff';
+        this.activeFillColor = 'white';
+        this.deactiveStrokeColor = 'grey';
+        this.deactiveFillColor = 'white';
+        this.selectedFillColor = '#30c2ff'
+    }
+}
 
 /*
     constructor
         Path(Point)
         Path(object) object must be 'slice of opentype.js Glyph commands'
 */ 
-class Path extends p.Group {
-    constructor(arg){
+class Path extends p.CompoundPath {
+    constructor(points){
         super();
         this.className = 'Path'
-        this.active = true;
-        this.select = true;
-        this.points = []
+        this.active = false;
+        this.select = false;
+        this.fillColor =  'white',
+        this.strokeColor = 'black',
+        this.strokeWidth = 3,
+        this.strokeScaling = false,
+
+        autoBind(this);
+
+        this.onMouseEnter = function(event) {
+
+        }
+        this.onMouseLeave = function(event) {
+
+        }
+        this.onClick = function(event) {
+
+        }
+        this.onMouseDrag = function(event) {
+
+        }
+    }
+    addPoint(point, onCurve){
+        if(onCurve === true){
+            new Point(point, parent)
+        }else{
+            new Point(point, parent)
+        }
+    }
+    pointActivate(){
+
+    }
+    pointDeactivate(){
+
+        this.Deselect();
+    }
+    Select(){
+
+    }
+    Deselect(){
+
+    }
+}
+
+class Glyph extends p.Group{
+    constructor(char, basePoint){
+        super();
+        this.className = 'Glyph'
+        this.active = false;
+        this.select = false;
+        this.charName = char;
+        this.outlinesFormat = FONT.outlinesFormat;
+        this.char = FONT.charToGlyph(char);
+
+        this.path = new Path(char, this)
+        this.points = [];
+        
+        this.children = [];
 
         if(arg) this.addChild(point);
 
@@ -720,7 +791,32 @@ class Path extends p.Group {
         this.onMouseDrag = function(event) {
 
         }
+
+        init();
+        draw();
     }
+    init(){
+
+    }
+
+    draw(){
+        
+    }
+
+    move()
+
+    getPath(){
+        return this.path;
+    }
+
+    setPath(){
+        if(this.char.points){
+            
+        }else if(this.char.path.commands){
+            
+        }
+    }
+
     addPoint(point, onCurve){
         if(onCurve === true){
             new Point(point)
@@ -766,8 +862,20 @@ function info(obj){
     }
 }
 
+
+
 function infoGlyph(char){
     var glyph = FONT.charToGlyph(char);
     var gPoints = glyph.points;
     info(gPoints);
+}
+
+
+// @param : glyph = FONT.charToGlyph(char)
+function testType(glyph){
+    if(glyph.points){
+        console.log('points')
+    }else if(glyph.path.commands){
+        console.log('path.commands')
+    }
 }
