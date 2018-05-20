@@ -147,6 +147,54 @@ const manage = {
     }
 }
 
+const util = {
+    scale : 1,
+    calcX(x, basePoint){
+        return basePoint.x + x;
+    },
+    calcY(y, basePoint){
+        return basePoint.y - y;
+    },
+    calcPoint(x, y, basePoint){
+        return [util.calcX(x, basePoint), util.calcY(y, basePoint)];
+    },
+    calcPath(arr, basePoint){
+        arr.forEach((obj)=>{
+            var calulatedPoint = util.calcPoint(obj.x, obj.y, basePoint);
+            obj.x = calulatedPoint.x;
+            obj.y = calulatedPoint.y;
+        })
+        return arr;
+    },
+    midPoint(args){
+        var x1, y1, x2, y2 = 0;
+        if(arguments.length == 2){
+            x1 = arguments[0][0], y1 = arguments[0][1], x2 = arguments[1][0], y2 = arguments[1][1];
+        }else if(arguments.length == 4){
+            x1 = arguments[0], y1 = arguments[1], x2 = arguments[2], y2 = arguments[3];
+        }else{
+            throw 'Can not get mid-point'
+        }
+        var retX = (x1 + x2) / 2;
+        var retY = (y1 + y2) / 2;
+        return new p.Point(retX, retY);
+    },
+    deleteSelected(){
+        for(var i = 0; i < manage.getLayerByName('glyph').children.length; i++){
+            manage.getLayerByName('glyph').children[i]
+            for(var j = 0; j < manage.getLayerByName('glyph').children[i].children.length; j++){
+                if(manage.getLayerByName('glyph').children[i].children[j]._select===true) {
+                    manage.getLayerByName('glyph').children[i].children[j].remove();
+                    --j;
+                }
+            }
+            if(manage.getLayerByName('glyph').children.length==0){
+                manage.getLayerByName('glyph').children[i].remove();
+                --i;
+            }
+        }
+    }
+}
 
 const draw = {
     basePoint:  (FONT) ? new p.Point(0,FONT.unitsPerEm) : new p.Point(0,1000),
@@ -154,13 +202,13 @@ const draw = {
         //change if needed
         var dist = (d == undefined) ? 100 : d; /* distance between line */
         var margin = 5; /* margin between line and text */
-        var extension = 2000; /* extended line for window pan/zoom/resize */
+        var extension = 10000; /* extended line for window pan/zoom/resize */
         var textsize = 8; /* fontsize for pointtext shift */
         //draw a vertical line
         var temp1 = new p.Point(x*dist, 0-extension);
         var temp2 = new p.Point(x*dist, canvas.height+extension);
         var path = new p.Path.Line(temp1, temp2);
-        path.strokeColor = 'black';
+        path.strokeColor = new p.Color(0,0,0,0.5);
         path.strokeWidth = 0.3;
         path.strokeScaling = false;
         //draw text alinged with vertical line
@@ -179,13 +227,13 @@ const draw = {
         //change if needed
         var dist = (d == undefined) ? 100 : d; /* distance between line */
         var margin = 5; /* margin between line and text */
-        var extension = 2000; /* extended line for window pan/zoom/resize */
+        var extension = 10000; /* extended line for window pan/zoom/resize */
         var textsize = 8; /* fontsize for pointtext shift */
         //draw a vertical line
         var temp1 = new p.Point(-extension, y*dist);
         var temp2 = new p.Point(canvas.width+extension, y*dist);
         var path = new p.Path.Line(temp1, temp2);
-        path.strokeColor = 'black';
+        path.strokeColor = new p.Color(0,0,0,0.5);
         path.strokeWidth = 0.3;
         path.strokeScaling = false;
         //draw text alinged with vertical line
@@ -203,7 +251,7 @@ const draw = {
     grid: function(d){
         // p.project.layers
         manage.activateLayerByName('grid')
-        var extension = 2000;
+        var extension = 10000;
         for(var i = 0, i = Math.round(i-extension/d); i < (canvas.width+extension)/d; i++){
             this.vLine(i, d)
         }
@@ -262,11 +310,11 @@ const draw = {
                 closed: true
             });
             pathElement.map((obj)=>{
-                path.add(draw.calc(obj.x, obj.y, basePoint))
-                this.point(draw.calc(obj.x, obj.y, basePoint)[0],draw.calc(obj.x, obj.y, basePoint)[1])
+                path.add(util.calcPoint(obj.x, obj.y, basePoint))
+                this.point(util.calcPoint(obj.x, obj.y, basePoint)[0],util.calcPoint(obj.x, obj.y, basePoint)[1])
             })
             var firstPoint = pathElement[0];
-            path.add(draw.calc(firstPoint.x, firstPoint.y, basePoint))
+            path.add(util.calcPoint(firstPoint.x, firstPoint.y, basePoint))
             pathGroup.addChild(path);
         })
         pathGroup.glyph = glyph;
@@ -274,7 +322,7 @@ const draw = {
     },
     glyphEscape: function(){
         manage.activateLayerByName('glyph')
-        manage.getCurrentPath().getLastChild().pointDeactivate();
+        if(manage.getCurrentPath().getLastChild()) manage.getCurrentPath().getLastChild().pointDeactivate();
         manage.getLayerByName('glyph').addChild(new p.Group({children: manage.getCurrentPath().children}))
         manage.getCurrentPath().removeChildren();
     },
@@ -282,15 +330,7 @@ const draw = {
             manage.activateLayerByName('glyph')
             manage.getLayerByName('glyph').children.map((obj)=>{obj.children.map((obj)=>{obj.pointDeactivate();})})
     },
-    calc(x, y, point){
-        var basePoint = (point == undefined) ? draw.basePoint: point;
-        var calcX = basePoint.x + x;
-        var calcY = basePoint.y - y;
-        var calculatedArr = [calcX, calcY];
-        return calculatedArr;
-    },
 
-    
 }
 
 const DEFAULT_SCALING = 1
@@ -469,12 +509,7 @@ canvasTool.onKeyDown = function (event) {
             if(manage.isSelected()) draw.glyphEscapeAll();
             break;
         } case 'delete':{
-            manage.getLayerByName('glyph').children.map((group)=>{
-                    group.children.map((item)=>{
-                        if(item.select===true) item.remove();
-                        if(group.children.length == 0) group.remove();
-                    })
-                })
+            util.deleteSelected();
             break;
         } default : {
             console.log(event)
@@ -606,8 +641,8 @@ class Point extends p.Group {
     constructor(x, y){
         super();
         this._className = 'PathPoint'
-        this.active = true;
-        this.select = true;
+        this._active = false;
+        this._select = false;
         this.radius = 4;
         this.x = x;
         this.y = y;
@@ -617,13 +652,16 @@ class Point extends p.Group {
         this.deactiveStrokeColor = 'grey';
         this.deactiveFillColor = 'white';
         this.selectedFillColor = '#30c2ff'
-        var point = new p.Path.Circle(new p.Point(x,y), this.radius);
-        point.fillColor = 'white';
-        var coordinates = new p.Group({
+        this.pointMarker = new p.Path.Circle({
+            center: this.point,
+            radius: this.radius,
+            fillColor: 'white'
+        });
+        this.coordinates = new p.Group({
             children: [
                 new p.Path.Rectangle({
                     point: [x+10, y-28],
-                    size: [48, 18],
+                    size: [52, 18],
                     fillColor: '#aaa',
                     radius: 3
                 }),
@@ -635,20 +673,20 @@ class Point extends p.Group {
                 })
             ]
         })
-        this.addChildren([point, coordinates]);
+        this.addChildren([this.pointMarker, this.coordinates]);
         autoBind(this);
 
         this.onMouseEnter = function(event) {
-            if(!this.active) this.pointActivate()
+            if(!this._active) this.pointActivate()
         }
         this.onMouseLeave = function(event) {
-            if(event.target.select == false) this.pointDeactivate();
+            if(event.target._select == false) this.pointDeactivate();
         }
         this.onClick = function(event) {
-            if(event.target.select === false) {
+            if(event.target._select === false) {
                 this.pointActivate()
-                this.Select();
-            }else if(event.target.select === true) {
+                this.select();
+            }else if(event.target._select === true) {
                 this.pointDeactivate();
             }
         }
@@ -657,23 +695,23 @@ class Point extends p.Group {
         }
     }
     pointActivate(){
-        this.children[0].strokeColor = '#30c2ff';
-        if(this.children[1].visible == false)this.children[1].visible = true;
-        this.active = true;
+        this.pointMarker.strokeColor = '#30c2ff';
+        if(this.coordinates.visible == false)this.children[1].visible = true;
+        this._active = true;
     }
     pointDeactivate(){
         this.children[0].strokeColor = 'grey';
         this.children[1].visible = false;
-        this.active = false;
-        this.Deselect();
+        this._active = false;
+        this.deselect();
     }
-    Select(){
+    select(){
         this.children[0].fillColor = '#30c2ff';
-        this.select = true;
+        this._select = true;
     }
-    Deselect(){
+    deselect(){
         this.children[0].fillColor = 'white';
-        this.select = false;
+        this._select = false;
     }
 }
 
@@ -681,7 +719,7 @@ class CubicHandle extends Point {
     constructor(x, y){
         super();
         this.className = 'Handle'
-        this.active = true;
+        this._active = true;
         this.select = true;
         this.radius = 3;
         this.activeStrokeColor = '#30c2ff';
@@ -696,7 +734,7 @@ class QuadricHandle extends Point {
     constructor(x, y){
         super();
         this.className = 'Handle'
-        this.active = true;
+        this._active = true;
         this.select = true;
         this.radius = 3;
         this.activeStrokeColor = '#30c2ff';
@@ -707,17 +745,22 @@ class QuadricHandle extends Point {
     }
 }
 
-/*
-    constructor
-        Path(Point)
-        Path(object) object must be 'slice of opentype.js Glyph commands'
-*/ 
 class Path extends p.CompoundPath {
-    constructor(points){
+    constructor(char, basePoint){
+        manage.activateLayerByName('glyph')
+
         super();
-        this.className = 'Path'
-        this.active = false;
-        this.select = false;
+        this._className = 'Path'
+        this._active = false;
+        this._select = false;
+        this._basePoint = basePoint || new p.Point(0,0);
+        // this.parent = parent;
+        this.glyph = FONT.charToGlyph(char);
+        this.pathArray = [];
+
+        this.charName = char;
+        this.outlinesFormat = FONT.outlinesFormat;
+
         this.fillColor =  'white',
         this.strokeColor = 'black',
         this.strokeWidth = 3,
@@ -737,14 +780,85 @@ class Path extends p.CompoundPath {
         this.onMouseDrag = function(event) {
 
         }
+        this.convertToPathArray();
+
+        this.pathArray.forEach((pathElement, index, pathArr)=>{
+            pathElement = this.getMidPointAddedArray(pathElement);
+            console.log(pathElement)
+            var path = new p.Path({ closed: true });
+            var tempOffPoint = null;
+            pathElement.forEach((obj, index, arr)=>{
+                var objPoint = new p.Point(util.calcPoint(obj.x, obj.y, this._basePoint))
+                if(index == 0 && obj.onCurve == true) {
+                    path.moveTo(objPoint);
+                    console.log(this.parent.points)
+                    // this.parent.points.addChild(new Point(objPoint.x,objPoint.y));
+                }else if(index == 0 && obj.onCurve !== true) throw 'Path first point is an Off Point';
+                else{
+                    if(obj.onCurve == true){
+                        if(tempOffPoint == null){
+                            path.lineTo(objPoint);
+                        }else{
+                            path.quadraticCurveTo(tempOffPoint, objPoint);
+                            // this.parent.points.addChild(new QuadricHandle(tempOffPoint.x,tempOffPoint.y));
+                            // this.parent.points.addChild(new Point(objPoint.x,objPoint.y));
+                            tempOffPoint = null;
+                        }
+                    }else if(obj.onCurve == false){
+                        if(tempOffPoint == null){
+                            tempOffPoint = objPoint;
+                        }else{
+                            throw 'Can not render two linked off Points yet, enable getMidPointAddedArray function before'
+                        }
+                    }
+                }
+
+            })
+            this.addChild(path);
+        })
     }
-    addPoint(point, onCurve){
-        if(onCurve === true){
-            new Point(point, parent)
-        }else{
-            new Point(point, parent)
+
+    getMidPointAddedArray(arr){
+        var retArr = [];
+        arr.forEach((obj, i, arr)=>{
+            if(obj.onCurve == true){
+                obj.pointType = 'point';
+                retArr.push(obj);
+            }else{
+                if(arr[i-1].onCurve == true){
+                    obj.pointType = 'quadricHandle';
+                    retArr.push(obj)
+                }else{
+                    var midPoint = util.midPoint(
+                        [arr[i-1].x, arr[i-1].y],
+                        [obj.x, obj.y]
+                    )
+                    retArr.push({
+                        lastPointOfContour: false,
+                        onCurve: true,
+                        x: midPoint.x,
+                        y: midPoint.y,
+                        pointType: 'quadricMidPoint'
+                    })
+                    obj.pointType = 'quadricHandle';
+                    retArr.push(obj)
+                }
+            }
+        })
+        return retArr;
+    }
+
+    convertToPathArray(){
+        var tempLastPoint = 0;
+        for(var i = 0; i < this.glyph.points.length; i++){
+            if(this.glyph.points[i].lastPointOfContour == true){
+                this.pathArray.push(this.glyph.points.slice(tempLastPoint, i+1));
+                tempLastPoint = i+1;
+            }
         }
+        return this.pathArray;
     }
+
     pointActivate(){
 
     }
@@ -758,24 +872,30 @@ class Path extends p.CompoundPath {
     Deselect(){
 
     }
+    black(){
+        this.fillColor = 'black';
+        this.strokeColor = null;
+    }
 }
 
 class Glyph extends p.Group{
     constructor(char, basePoint){
         super();
-        this.className = 'Glyph'
-        this.active = false;
-        this.select = false;
+        this._className = 'Glyph'
+        this._active = false;
+        this._select = false;
         this.charName = char;
         this.outlinesFormat = FONT.outlinesFormat;
-        this.char = FONT.charToGlyph(char);
 
-        this.path = new Path(char, this)
-        this.points = [];
+        //Lower Variables should act as states
+        this.glyph = FONT.charToGlyph(char);
+        this._basePoint = basePoint;
+
+        //L
+        this.path = new Path(char, this._basePoint);
+        this.points = new p.Group();
         
         this.children = [];
-
-        if(arg) this.addChild(point);
 
         autoBind(this);
 
@@ -793,17 +913,18 @@ class Glyph extends p.Group{
         }
 
         init();
-        draw();
     }
     init(){
-
+        this.glyph.points;
     }
 
     draw(){
         
     }
 
-    move()
+    move(){
+
+    }
 
     getPath(){
         return this.path;
