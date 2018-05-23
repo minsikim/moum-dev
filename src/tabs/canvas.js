@@ -159,12 +159,13 @@ const util = {
         return [util.calcX(x, basePoint), util.calcY(y, basePoint)];
     },
     calcPath(arr, basePoint){
-        arr.forEach((obj)=>{
+        var retArr = [...arr];
+        retArr.forEach((obj)=>{
             var calulatedPoint = util.calcPoint(obj.x, obj.y, basePoint);
             obj.x = calulatedPoint.x;
             obj.y = calulatedPoint.y;
         })
-        return arr;
+        return retArr;
     },
     midPoint(args){
         var x1, y1, x2, y2 = 0;
@@ -264,7 +265,7 @@ const draw = {
         x = Math.round(x);
         y = Math.round(y);
         manage.activateLayerByName('glyph');
-        var point = new Point(x,y);
+        var point = new Point(util.calcPoint(x,y, new p.Point(0,0)));
         point.pointActivate();
         var index = manage.getCurrentPath().children.length!==0 ? manage.getCurrentPath().children.length-1 : null;
         if(index !== null) {manage.getCurrentPath().children[index].pointDeactivate();}
@@ -570,6 +571,7 @@ canvasTool.onMouseUp = function (event) {
             break;
         }
         case 'PATH_MODE_P':{
+            console.log(event);
             if(event.downPoint.x === event.point.x && event.downPoint.y === event.point.y){
                 draw.point(event.point.x, event.point.y);
             }
@@ -638,42 +640,27 @@ canvas.addEventListener('mousewheel', function(event){
 }, false)
 
 class Point extends p.Group {
-    constructor(x, y){
+    constructor(x, y, basePoint){
         super();
         this._className = 'PathPoint'
         this._active = false;
         this._select = false;
-        this.radius = 4;
+        this.radius = 8;
         this.x = x;
         this.y = y;
         this.point = new p.Point(x, y);
+        this._basePoint = basePoint || new p.Point(0,0);
+        
+        this.calcX = util.calcX(x, this._basePoint);
+        this.calcY = util.calcY(y, this._basePoint);
+        this.calcPoint = util.calcPoint(x, y, this._basePoint);
+
         this.activeStrokeColor = '#91DFFF';
         this.activeFillColor = 'white';
         this.deactiveStrokeColor = 'grey';
         this.deactiveFillColor = 'white';
         this.selectedFillColor = '#30c2ff'
-        this.pointMarker = new p.Path.Circle({
-            center: this.point,
-            radius: this.radius,
-            fillColor: 'white'
-        });
-        this.coordinates = new p.Group({
-            children: [
-                new p.Path.Rectangle({
-                    point: [x+10, y-28],
-                    size: [52, 18],
-                    fillColor: '#aaa',
-                    radius: 3
-                }),
-                new p.PointText({
-                    point: [x+15, y-15],
-                    content: x.toString()+', '+y.toString(),
-                    fillColor: 'white',
-                    fontSize: 10
-                })
-            ]
-        })
-        this.addChildren([this.pointMarker, this.coordinates]);
+
         autoBind(this);
 
         this.onMouseEnter = function(event) {
@@ -686,6 +673,8 @@ class Point extends p.Group {
             if(event.target._select === false) {
                 this.pointActivate()
                 this.select();
+                console.log(this.parent)
+                log('Glyph: '+this.parent.parent.char+' | '+this.x+', '+this.y)
             }else if(event.target._select === true) {
                 this.pointDeactivate();
             }
@@ -693,35 +682,63 @@ class Point extends p.Group {
         this.onMouseDrag = function(event) {
 
         }
+        this.init()
     }
+    
+    init(){
+        this.pointMarker = new p.Path.Circle({
+            center: this.calcPoint,
+            radius: this.radius,
+            strokeColor: this.deactiveStrokeColor,
+            strokeWidth: 2,
+            fillColor: this.deactiveFillColor,
+        });
+        this.coordinates = new p.Group({
+            children: [
+                new p.Path.Rectangle({
+                    point: [this.calcX+10, this.calcY-28],
+                    size: [52, 18],
+                    fillColor: '#aaa',
+                    radius: 3
+                }),
+                new p.PointText({
+                    point: [this.calcX+15, this.calcY-15],
+                    content: this.x+', '+this.y,
+                    fillColor: 'white',
+                    fontSize: 10
+                })
+            ],
+            visible: false
+        })
+        this.addChildren([this.pointMarker, this.coordinates]);
+    }
+
     pointActivate(){
-        this.pointMarker.strokeColor = '#30c2ff';
+        this.pointMarker.strokeColor = this.activeStrokeColor;
         if(this.coordinates.visible == false)this.children[1].visible = true;
         this._active = true;
     }
     pointDeactivate(){
-        this.children[0].strokeColor = 'grey';
-        this.children[1].visible = false;
+        this.pointMarker.strokeColor = this.deactiveStrokeColor;
+        this.coordinates.visible = false;
         this._active = false;
         this.deselect();
     }
     select(){
-        this.children[0].fillColor = '#30c2ff';
+        this.pointMarker.fillColor = this.selectedFillColor;
         this._select = true;
     }
     deselect(){
-        this.children[0].fillColor = 'white';
+        this.pointMarker.fillColor = this.deactiveFillColor;
         this._select = false;
     }
 }
 
 class CubicHandle extends Point {
-    constructor(x, y){
-        super();
-        this.className = 'Handle'
-        this._active = true;
-        this.select = true;
-        this.radius = 3;
+    constructor(x, y, basePoint){
+        super(x, y, basePoint);
+        this._className = 'CubicHandle'
+        this.pointMarker.radius = 5;
         this.activeStrokeColor = '#30c2ff';
         this.activeFillColor = 'white';
         this.deactiveStrokeColor = 'grey';
@@ -731,12 +748,10 @@ class CubicHandle extends Point {
 }
 
 class QuadricHandle extends Point {
-    constructor(x, y){
-        super();
-        this.className = 'Handle'
-        this._active = true;
-        this.select = true;
-        this.radius = 3;
+    constructor(x, y, basePoint){
+        super(x, y, basePoint);
+        this._className = 'QuadricHandle'
+        this.pointMarker.radius = 5;
         this.activeStrokeColor = '#30c2ff';
         this.activeFillColor = 'white';
         this.deactiveStrokeColor = 'grey';
@@ -761,8 +776,8 @@ class Path extends p.CompoundPath {
         this.charName = char;
         this.outlinesFormat = FONT.outlinesFormat;
 
-        this.fillColor =  'white',
-        this.strokeColor = 'black',
+        this.fillColor =  'black',
+        this.strokeColor = '#96E4FF',
         this.strokeWidth = 3,
         this.strokeScaling = false,
 
@@ -800,8 +815,6 @@ class Path extends p.CompoundPath {
                             path.lineTo(objPoint);
                         }else{
                             path.quadraticCurveTo(tempOffPoint, objPoint);
-                            // this.parent.points.addChild(new QuadricHandle(tempOffPoint.x,tempOffPoint.y));
-                            // this.parent.points.addChild(new Point(objPoint.x,objPoint.y));
                             tempOffPoint = null;
                         }
                     }else if(obj.onCurve == false){
@@ -880,6 +893,8 @@ class Path extends p.CompoundPath {
 
 class Glyph extends p.Group{
     constructor(char, basePoint){
+        manage.activateLayerByName('glyph')
+
         super();
         this._className = 'Glyph'
         this._active = false;
@@ -887,35 +902,42 @@ class Glyph extends p.Group{
         this.charName = char;
         this.outlinesFormat = FONT.outlinesFormat;
 
-        //Lower Variables should act as states
+        //Following Variables should act as states
         this.glyph = FONT.charToGlyph(char);
         this._basePoint = basePoint;
 
-        //L
+        //add Compound path and point Group
         this.path = new Path(char, this._basePoint);
         this.points = new p.Group();
         
-        this.children = [];
+        // this.children = [this.path, this.points];
+        this.addChildren([this.path, this.points]);
+        // autoBind(this);
 
-        autoBind(this);
+        // this.onMouseEnter = function(event) {
 
-        this.onMouseEnter = function(event) {
+        // }
+        // this.onMouseLeave = function(event) {
 
-        }
-        this.onMouseLeave = function(event) {
+        // }
+        // this.onClick = function(event) {
 
-        }
-        this.onClick = function(event) {
+        // }
+        // this.onMouseDrag = function(event) {
 
-        }
-        this.onMouseDrag = function(event) {
+        // }
 
-        }
-
-        init();
+        this.initPoints();
     }
-    init(){
-        this.glyph.points;
+    initPoints(){
+        console.log('initializing points: ' + this.glyph.points.length)
+        this.glyph.points.forEach((obj, index, arr)=>{
+            if(obj.onCurve){
+                this.points.addChild(new Point(obj.x, obj.y, this._basePoint));
+            }else{
+                this.points.addChild(new QuadricHandle(obj.x, obj.y, this._basePoint));
+            }
+        })
     }
 
     draw(){
