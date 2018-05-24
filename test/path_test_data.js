@@ -3,7 +3,16 @@ const p = require('paper')
 //@params path(class paper.Path)
 //@return [centerPath(class paper.Path), offset(Number)]
 function getStroke(path){
-    
+    var centerStroke = null;
+    var longestCurve = getLongestCurve(path);
+    if(Array.isArray(longestCurve) && longestCurve.length == 2){
+        centerStroke = midStroke(longestCurve);
+        return centerStroke;
+    }
+}
+
+function midStroke(pathArray){
+    // path
 }
 
 //@params path(class paper.Path)
