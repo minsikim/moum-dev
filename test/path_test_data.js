@@ -55,4 +55,7 @@ var path4 = new p.Path({
     closed: true,
     selected: true
 })
-
+path4.moveTo(0,400)
+path4.lineTo(200,450)
+path4.lineTo(100,500)
+path4.lineTo(0,450)
