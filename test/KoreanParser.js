@@ -31,9 +31,16 @@ JONG = [
  */
 function johap(arrIn){
     let ret = 44032;
-    let index1 = CHO.indexOf(arrIn[0]);
-    let index2 = JUNG.indexOf(arrIn[1]);
-    let index3 = JONG.indexOf(arrIn[2]);
+    let index1,index2,index3 = 0;
+    if(typeof arrIn[0] == 'number'){
+        index1 = arrIn[0];
+        index2 = arrIn[1];
+        index3 = arrIn[2];
+    }else if(typeof arrIn[0] == 'string'){
+        index1 = CHO.indexOf(arrIn[0]);
+        index2 = JUNG.indexOf(arrIn[1]);
+        index3 = JONG.indexOf(arrIn[2]);
+    }
     ret += (21*28*index1)+(28*index2)+(index3);
     return ret;
 }
@@ -59,11 +66,16 @@ function johapChar(arrIn){
  */
 function johapArr(chosungArr, jungsungArr, jongsungArr){
     let charString = ''
+    if(chosungArr.length == 0 || chosungArr == undefined) chosungArr = [...CHO];
+    if(jungsungArr.length == 0 || jungsungArr == undefined) jungsungArr = [...JUNG];
+    if(jongsungArr.length == 0 || jongsungArr == undefined) jongsungArr = [...JONG];
     for(let i = 0; i < chosungArr.length; i++){
         for(let j = 0; j < jungsungArr.length; j++){
             for (let k = 0; k < jongsungArr.length; k++) {
-                
-                charString += 
+                var choIndex = getLetterIndex(chosungArr[i],1);
+                var jungIndex = getLetterIndex(jungsungArr[j],2);
+                var jongIndex = getLetterIndex(jongsungArr[k],3);
+                charString += johapChar([choIndex,jungIndex,jongIndex]);
             }
         }
     }
@@ -84,16 +96,13 @@ function getLetterIndex(char, charPosition){
             positionArr = CHO;
             break;
         }case 2: {
+            positionArr = JUNG;
             break;
         }case 3: {
+            positionArr = JONG;
             break;
         }
     }
-    positionArr.every((obj,idx,arr)=>{
-        if(char == obj) {
-            letterIndex = idx;
-            return false;
-        }else return true;
-    })
+    letterIndex = positionArr.indexOf(char)
     return letterIndex;
 }
