@@ -1022,3 +1022,33 @@ function testType(glyph){
         console.log('path.commands')
     }
 }
+
+function getPathinfo(path){
+    if(Array.isArray(path)){
+        path.forEach((obj, idx, arr)=>{
+            getPathinfo(obj);
+        })
+        return;
+    }else{
+        switch(path.className){
+            case 'Curve':{
+                console.log(path.className+': ',
+                'point1: '+path.point1.x+','+path.point1.y, 
+                'handle 1: '+path.handle1.x+','+path.handle1.y,
+                'handle 2: '+path.handle2.x+','+path.handle2.y,
+                'point2: '+path.point2.x+','+path.point2.y);
+                break;
+            }case 'Path':{
+                var segments = path.segments;
+                for(var i = 0; i < segments.length; i++){
+                    var s = segments[i];
+                    console.log(s.index+': ',
+                    'point: '+s.point.x+','+s.point.y, 
+                    'handle in: '+s.handleIn.x+','+s.handleIn.y,
+                    'handle out: '+s.handleOut.x+','+s.handleOut.y);
+                }
+                break;
+            }
+        }
+    }
+}
