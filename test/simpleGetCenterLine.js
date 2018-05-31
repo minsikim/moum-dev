@@ -176,3 +176,22 @@ function getLongestCurve(path){
     }
     return longestCurveArr || longestCurve;
 }
+
+function selectSegments(path){
+    path.segments.forEach((obj)=>{
+        obj.selected = true
+    })
+}
+
+function addNumberToSegments(path){
+    var tempGroup = new p.Group()
+    path.segments.forEach((obj,idx)=>{
+        tempGroup.addChild(
+            new p.PointText({
+                point: new p.Point(obj.point.x+20,obj.point.y-20),
+                content: idx,
+                fillColor: 'black'
+            })
+        )
+    })
+}
