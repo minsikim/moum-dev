@@ -1,8 +1,9 @@
+let paths = []
 function initPathTest(){
     // Predicted test results
     // getStroke -> Path([[0,50],[200,50]])
     manage.activateLayerByName('glyph')
-    var paths = {
+    paths = {
         path1: new p.Path({
             segments: [
                 [0,0],

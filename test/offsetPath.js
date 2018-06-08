@@ -129,7 +129,7 @@ function getOffsetCurves(curve, offset, method) {
     var errorThreshold = 0.01,
         radius = Math.abs(offset),
         // offsetMethod = this['offsetCurve_' + (method || 'middle')],
-        offsetMethod = offsetCurve_middle,
+        offsetMethod = offsetCurve_simple,
         that = this;
 
     function offsetCurce(curve, curves, recursion) {
@@ -182,6 +182,21 @@ function offsetCurve_middle(curve, offset) {
         a = d.cross(t2) / div,
         b = d.cross(t1) / div;
     return new p.Curve(p1, t1.multiply(a), t2.multiply(-b), p2);
+}
+
+function offsetCurve_simple(crv, dist) {
+    // calculate end points of offset curve
+    var p1 = crv.point1.add(crv.getNormalAtTime(0).multiply(dist));
+    var p4 = crv.point2.add(crv.getNormalAtTime(1).multiply(dist));
+    // get scale ratio
+    var pointDist = crv.point1.getDistance(crv.point2);
+    // TODO: Handle cases when pointDist == 0
+    var f = p1.getDistance(p4) / pointDist;
+    if (crv.point2.subtract(crv.point1).dot(p4.subtract(p1)) < 0) {
+        f = -f; // probably more correct than connecting with line
+    }
+    // Scale handles and generate offset curve
+    return new p.Curve(p1, crv.handle1.multiply(f), crv.handle2.multiply(f), p4);
 }
 
 function getAverageTangentTime(v) {
